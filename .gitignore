@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+out-test/
+.claude/worktrees/
+*.log
+.DS_Store
+Thumbs.db
+*.local
+.env
+.env.*
+.claude

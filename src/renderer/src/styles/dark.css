@@ -1,0 +1,79 @@
+/* Dark theme overrides (Apple-style) */
+html[data-theme='dark'] {
+  --color-bg-primary: #1c1c1e;
+  --color-bg-secondary: #2c2c2e;
+  --color-bg-tertiary: #3a3a3c;
+  --color-bg-sidebar: #2c2c2e;
+  --color-bg-titlebar: #323234;
+  --color-bg-input: #2c2c2e;
+  --color-bg-hover: rgba(255, 255, 255, 0.06);
+  --color-bg-active: rgba(255, 255, 255, 0.09);
+
+  --color-text-primary: #f5f5f7;
+  --color-text-secondary: #a1a1a6;
+  --color-text-tertiary: #6e6e73;
+  --color-text-placeholder: #48484a;
+  --color-text-inverse: #1d1d1f;
+
+  --color-border: #38383a;
+  --color-border-light: #2c2c2e;
+  --color-border-focus: #0a84ff;
+
+  --color-accent: #0a84ff;
+  --color-accent-hover: #409cff;
+  --color-accent-active: #0070e0;
+
+  --color-method-get: #64d2ff;
+  --color-method-post: #30d158;
+  --color-method-put: #ffd60a;
+  --color-method-delete: #ff453a;
+  --color-method-patch: #64d2ff;
+  --color-method-head: #bf5af2;
+  --color-method-options: #5e5ce6;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.2);
+  --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode Element Plus overrides */
+html[data-theme='dark'] .el-input__wrapper {
+  background-color: #2c2c2e;
+  box-shadow: 0 0 0 1px #38383a inset;
+}
+
+html[data-theme='dark'] .el-input__inner {
+  color: #f5f5f7;
+}
+
+html[data-theme='dark'] .el-dialog {
+  background-color: #2c2c2e;
+  border: 1px solid #38383a;
+  border-radius: var(--radius-lg);
+}
+
+html[data-theme='dark'] .el-dialog__title {
+  color: #f5f5f7;
+}
+
+html[data-theme='dark'] .el-dialog__headerbtn .el-dialog__close {
+  color: #a1a1a6;
+}
+
+html[data-theme='dark'] .el-textarea__inner {
+  background-color: #2c2c2e;
+  color: #f5f5f7;
+  border-color: #38383a;
+}
+
+/* Dark mode JSON tree improvements */
+html[data-theme='dark'] .json-tree {
+  --json-key: #9cdcfe;
+  --json-string: #ce9178;
+  --json-number: #b5cea8;
+  --json-boolean: #569cd6;
+  --json-null: #6e6e73;
+  --json-bracket: #f5f5f7;
+}

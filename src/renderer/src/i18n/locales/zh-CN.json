@@ -1,0 +1,245 @@
+{
+  "common": {
+    "ok": "确定",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭",
+    "confirm": "确认",
+    "search": "搜索",
+    "loading": "加载中...",
+    "noData": "暂无数据",
+    "name": "名称",
+    "description": "描述",
+    "actions": "操作",
+    "send": "发送",
+    "saveTo": "保存到",
+    "new": "新建",
+    "duplicate": "复制",
+    "rename": "重命名",
+    "import": "导入",
+    "export": "导出",
+    "load": "加载"
+  },
+  "app": {
+    "name": "Requestor",
+    "title": "API 测试工具"
+  },
+  "titlebar": {
+    "settings": "设置"
+  },
+  "sidebar": {
+    "collections": "集合",
+    "history": "历史记录",
+    "newCollection": "新建集合",
+    "newFolder": "新建文件夹",
+    "newRequest": "新建请求",
+    "emptyCollections": "还没有集合",
+    "emptyHistory": "还没有历史记录",
+    "clearHistory": "清空历史",
+    "deleteCollection": "删除集合",
+    "deleteRequest": "删除请求",
+    "deleteFolder": "删除文件夹",
+    "trash": "垃圾箱",
+    "emptyTrash": "垃圾箱为空"
+  },
+  "request": {
+    "method": "方法",
+    "url": "输入请求 URL",
+    "params": "参数",
+    "headers": "请求头",
+    "body": "请求体",
+    "auth": "认证",
+    "cookies": "Cookies",
+    "bodyType": {
+      "none": "none",
+      "formdata": "form-data",
+      "urlencoded": "x-www-form-urlencoded",
+      "raw": "raw",
+      "binary": "binary"
+    },
+    "rawType": {
+      "json": "JSON",
+      "text": "Text",
+      "xml": "XML",
+      "html": "HTML"
+    },
+    "authType": {
+      "none": "无认证",
+      "bearer": "Bearer Token",
+      "basic": "Basic Auth",
+      "apikey": "API Key"
+    },
+    "key": "键",
+    "value": "值",
+    "curlExport": "导出 cURL",
+    "curlImport": "导入 cURL",
+    "importCurl": "粘贴 cURL 命令",
+    "description": "描述",
+    "enabled": "启用",
+    "addRow": "添加一行",
+    "selectFile": "选择文件",
+    "token": "Token",
+    "username": "用户名",
+    "password": "密码"
+  },
+  "response": {
+    "body": "响应体",
+    "headers": "响应头",
+    "cookies": "Cookies",
+    "timing": "耗时",
+    "pretty": "格式化",
+    "raw": "原始",
+    "status": "状态",
+    "time": "时间",
+    "size": "大小",
+    "noResponse": "发送请求以查看响应",
+    "error": "请求失败",
+    "sending": "正在发送...",
+    "copy": "复制响应",
+    "copied": "已复制到剪贴板",
+    "search": "搜索响应内容...",
+    "timeline": "耗时分解",
+    "timelineDns": "DNS",
+    "timelineConnect": "连接",
+    "timelineTls": "TLS",
+    "timelineTtfb": "首字节",
+    "timelineDownload": "下载",
+    "noCookies": "响应中没有 Cookies",
+    "preview": "预览",
+    "fullscreen": "全屏",
+    "saveAsExample": "保存为示例",
+    "savedAsExample": "已保存为响应示例"
+  },
+  "environment": {
+    "title": "环境变量",
+    "manage": "管理环境",
+    "newEnv": "新建环境",
+    "noEnv": "无环境",
+    "noActive": "未选择环境",
+    "variable": "变量",
+    "initialValue": "初始值",
+    "currentValue": "当前值",
+    "addVariable": "添加变量",
+    "deleteEnv": "删除环境"
+  },
+  "settings": {
+    "title": "设置",
+    "theme": "主题",
+    "language": "语言",
+    "auto": "跟随系统",
+    "light": "浅色",
+    "dark": "深色",
+    "general": "通用",
+    "about": "关于"
+  },
+  "history": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "thisWeek": "本周",
+    "older": "更早",
+    "empty": "还没有历史记录",
+    "rerun": "重新发送",
+    "saveToCollection": "保存到集合",
+    "selectMode": "多选",
+    "saveSelected": "保存选中 ({count})"
+  },
+  "tab": {
+    "newTab": "新建标签",
+    "closeTab": "关闭标签",
+    "unsaved": "未保存"
+  },
+  "dialog": {
+    "saveToCollection": "保存到集合",
+    "selectCollection": "选择集合",
+    "targetCollection": "目标集合",
+    "collectionName": "输入集合名称",
+    "requestsToSave": "将保存 {count} 个请求",
+    "confirmDeleteCollection": "确定要删除集合「{name}」吗？删除后可在垃圾箱中恢复。",
+    "confirmDeleteRequest": "确定要删除此请求吗？",
+    "confirmBatchDelete": "确定要删除选中的 {count} 个集合吗？删除后可在垃圾箱中恢复。",
+    "confirmPermanentDelete": "确定要永久删除「{name}」吗？此操作不可撤销。",
+    "confirmClearTrash": "确定要清空垃圾箱中的 {count} 个项目吗？此操作不可撤销。"
+  },
+  "toast": {
+    "savedToCollection": "已保存到集合",
+    "copiedToClipboard": "已复制到剪贴板",
+    "curlCopied": "cURL 命令已复制",
+    "curlImported": "cURL 已导入",
+    "curlImportError": "无法解析 cURL 命令",
+    "itemDuplicated": "已复制请求",
+    "requestSuccess": "请求成功（状态码 {status}）",
+    "requestError": "请求失败：{message}",
+    "requestErrorStatus": "请求失败（状态码 {status}）",
+    "exportSuccess": "导出成功",
+    "importSuccess": "导入成功，共 {count} 个集合",
+    "importError": "导入失败，文件格式错误",
+    "postmanExportSuccess": "Postman 导出成功",
+    "htmlDocExportSuccess": "API 文档导出成功"
+  },
+  "globalSearch": {
+    "title": "全局搜索",
+    "placeholder": "搜索历史记录和集合...",
+    "hint": "输入至少 2 个字符开始搜索",
+    "noResults": "未找到匹配结果"
+  },
+  "trash": {
+    "autoCleanup": "30 天后自动清除",
+    "clearAll": "清空垃圾箱",
+    "restore": "恢复",
+    "permanentDelete": "永久删除",
+    "requests": "个请求",
+    "daysAgo": "天前",
+    "daysLeft": "天后清除",
+    "items": "请求",
+    "fromCollection": "来自合集"
+  },
+  "collection": {
+    "responseExamples": "响应示例",
+    "addExample": "添加示例",
+    "deleteExample": "删除示例",
+    "noExamples": "暂无响应示例",
+    "exportPostman": "导出为 Postman JSON",
+    "exportHtmlDoc": "导出 API 文档"
+  },
+  "keyValueEditor": {
+    "copyQueryString": "复制为查询字符串",
+    "bulkEditJson": "JSON 对象",
+    "bulkEditJsonArray": "JSON 数组",
+    "bulkEditQueryString": "Query String",
+    "bulkEdit": "批量编辑"
+  },
+  "auth": {
+    "enterToken": "输入 token",
+    "headerQueryName": "Header/Query 名称",
+    "apiKeyValue": "API key 值",
+    "addTo": "添加到",
+    "header": "Header",
+    "queryParam": "Query 参数"
+  },
+  "bodyForm": {
+    "type": "类型"
+  },
+  "responseView": {
+    "expandAll": "展开全部",
+    "collapseAll": "折叠全部",
+    "previous": "上一个",
+    "next": "下一个",
+    "error": "错误",
+    "name": "名称",
+    "value": "值",
+    "domain": "域名",
+    "path": "路径"
+  },
+  "environmentEditor": {
+    "keyPlaceholder": "变量名",
+    "valuePlaceholder": "值"
+  },
+  "cache": {
+    "title": "缓存",
+    "history": "历史",
+    "collections": "集合",
+    "total": "总计"
+  }
+}

@@ -1,0 +1,245 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "loading": "Loading...",
+    "noData": "No data",
+    "name": "Name",
+    "description": "Description",
+    "actions": "Actions",
+    "send": "Send",
+    "saveTo": "Save to",
+    "new": "New",
+    "duplicate": "Duplicate",
+    "rename": "Rename",
+    "import": "Import",
+    "export": "Export",
+    "load": "Load"
+  },
+  "app": {
+    "name": "Requestor",
+    "title": "API Testing Tool"
+  },
+  "titlebar": {
+    "settings": "Settings"
+  },
+  "sidebar": {
+    "collections": "Collections",
+    "history": "History",
+    "newCollection": "New Collection",
+    "newFolder": "New Folder",
+    "newRequest": "New Request",
+    "emptyCollections": "No collections yet",
+    "emptyHistory": "No history yet",
+    "clearHistory": "Clear History",
+    "deleteCollection": "Delete Collection",
+    "deleteRequest": "Delete Request",
+    "deleteFolder": "Delete Folder",
+    "trash": "Trash",
+    "emptyTrash": "Trash is empty"
+  },
+  "request": {
+    "method": "Method",
+    "url": "Enter request URL",
+    "params": "Params",
+    "headers": "Headers",
+    "body": "Body",
+    "auth": "Auth",
+    "cookies": "Cookies",
+    "bodyType": {
+      "none": "none",
+      "formdata": "form-data",
+      "urlencoded": "x-www-form-urlencoded",
+      "raw": "raw",
+      "binary": "binary"
+    },
+    "rawType": {
+      "json": "JSON",
+      "text": "Text",
+      "xml": "XML",
+      "html": "HTML"
+    },
+    "authType": {
+      "none": "No Auth",
+      "bearer": "Bearer Token",
+      "basic": "Basic Auth",
+      "apikey": "API Key"
+    },
+    "key": "Key",
+    "value": "Value",
+    "curlExport": "Export cURL",
+    "curlImport": "Import cURL",
+    "importCurl": "Paste cURL command",
+    "description": "Description",
+    "enabled": "Enabled",
+    "addRow": "Add Row",
+    "selectFile": "Select File",
+    "token": "Token",
+    "username": "Username",
+    "password": "Password"
+  },
+  "response": {
+    "body": "Body",
+    "headers": "Headers",
+    "cookies": "Cookies",
+    "timing": "Timing",
+    "pretty": "Pretty",
+    "raw": "Raw",
+    "status": "Status",
+    "time": "Time",
+    "size": "Size",
+    "noResponse": "Send a request to see the response",
+    "error": "Request failed",
+    "sending": "Sending...",
+    "copy": "Copy Response",
+    "copied": "Copied to clipboard",
+    "search": "Search response...",
+    "timeline": "Timeline",
+    "timelineDns": "DNS",
+    "timelineConnect": "Connect",
+    "timelineTls": "TLS",
+    "timelineTtfb": "TTFB",
+    "timelineDownload": "Download",
+    "noCookies": "No cookies in response",
+    "preview": "Preview",
+    "fullscreen": "Fullscreen",
+    "saveAsExample": "Save as Example",
+    "savedAsExample": "Saved as response example"
+  },
+  "environment": {
+    "title": "Environment Variables",
+    "manage": "Manage Environments",
+    "newEnv": "New Environment",
+    "noEnv": "No environment",
+    "noActive": "No active environment",
+    "variable": "Variable",
+    "initialValue": "Initial Value",
+    "currentValue": "Current Value",
+    "addVariable": "Add Variable",
+    "deleteEnv": "Delete Environment"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "language": "Language",
+    "auto": "Auto",
+    "light": "Light",
+    "dark": "Dark",
+    "general": "General",
+    "about": "About"
+  },
+  "history": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "older": "Older",
+    "empty": "No history yet",
+    "rerun": "Re-run",
+    "saveToCollection": "Save to Collection",
+    "selectMode": "Select",
+    "saveSelected": "Save selected ({count})"
+  },
+  "tab": {
+    "newTab": "New Tab",
+    "closeTab": "Close Tab",
+    "unsaved": "Unsaved"
+  },
+  "dialog": {
+    "saveToCollection": "Save to Collection",
+    "selectCollection": "Select a collection",
+    "targetCollection": "Target collection",
+    "collectionName": "Enter collection name",
+    "requestsToSave": "{count} request(s) to save",
+    "confirmDeleteCollection": "Delete collection \"{name}\"? It can be restored from Trash.",
+    "confirmDeleteRequest": "Delete this request?",
+    "confirmBatchDelete": "Delete {count} selected collection(s)? They can be restored from Trash.",
+    "confirmPermanentDelete": "Permanently delete \"{name}\"? This cannot be undone.",
+    "confirmClearTrash": "Permanently delete {count} item(s) from Trash? This cannot be undone."
+  },
+  "toast": {
+    "savedToCollection": "Saved to collection",
+    "copiedToClipboard": "Copied to clipboard",
+    "curlCopied": "cURL copied",
+    "curlImported": "cURL imported",
+    "curlImportError": "Failed to parse cURL command",
+    "itemDuplicated": "Request duplicated",
+    "requestSuccess": "Request successful (status {status})",
+    "requestError": "Request failed: {message}",
+    "requestErrorStatus": "Request failed (status {status})",
+    "exportSuccess": "Export successful",
+    "importSuccess": "Import successful, {count} collection(s)",
+    "importError": "Import failed, invalid file format",
+    "postmanExportSuccess": "Postman export successful",
+    "htmlDocExportSuccess": "API documentation exported"
+  },
+  "globalSearch": {
+    "title": "Global Search",
+    "placeholder": "Search history and collections...",
+    "hint": "Type at least 2 characters to search",
+    "noResults": "No matching results"
+  },
+  "trash": {
+    "autoCleanup": "Auto-cleanup after 30 days",
+    "clearAll": "Empty Trash",
+    "restore": "Restore",
+    "permanentDelete": "Permanently delete",
+    "requests": "requests",
+    "daysAgo": "days ago",
+    "daysLeft": "days left",
+    "items": "Requests",
+    "fromCollection": "From"
+  },
+  "collection": {
+    "responseExamples": "Response Examples",
+    "addExample": "Add Example",
+    "deleteExample": "Delete Example",
+    "noExamples": "No response examples",
+    "exportPostman": "Export as Postman JSON",
+    "exportHtmlDoc": "Export API Documentation"
+  },
+  "keyValueEditor": {
+    "copyQueryString": "Copy as query string",
+    "bulkEditJson": "JSON Object",
+    "bulkEditJsonArray": "JSON Array",
+    "bulkEditQueryString": "Query String",
+    "bulkEdit": "Bulk Edit"
+  },
+  "auth": {
+    "enterToken": "Enter token",
+    "headerQueryName": "Header/Query name",
+    "apiKeyValue": "API key value",
+    "addTo": "Add to",
+    "header": "Header",
+    "queryParam": "Query Param"
+  },
+  "bodyForm": {
+    "type": "Type"
+  },
+  "responseView": {
+    "expandAll": "Expand All",
+    "collapseAll": "Collapse All",
+    "previous": "Previous",
+    "next": "Next",
+    "error": "Error",
+    "name": "Name",
+    "value": "Value",
+    "domain": "Domain",
+    "path": "Path"
+  },
+  "environmentEditor": {
+    "keyPlaceholder": "key",
+    "valuePlaceholder": "value"
+  },
+  "cache": {
+    "title": "Cache",
+    "history": "History",
+    "collections": "Collections",
+    "total": "Total"
+  }
+}

@@ -1,0 +1,117 @@
+/* Element Plus theme overrides — sync with design tokens (Apple-style) */
+
+/* Override Element Plus CSS variables for light theme */
+:root {
+  --el-color-primary: var(--color-accent);
+  --el-color-primary-light-3: var(--color-accent-hover);
+  --el-color-primary-dark-2: var(--color-accent-active);
+  --el-color-success: var(--color-success);
+  --el-color-warning: var(--color-warning);
+  --el-color-danger: var(--color-danger);
+  --el-color-info: var(--color-info);
+
+  --el-bg-color: var(--color-bg-primary);
+  --el-bg-color-page: var(--color-bg-secondary);
+  --el-bg-color-overlay: var(--color-bg-primary);
+
+  --el-text-color-primary: var(--color-text-primary);
+  --el-text-color-regular: var(--color-text-secondary);
+  --el-text-color-secondary: var(--color-text-tertiary);
+  --el-text-color-placeholder: var(--color-text-placeholder);
+
+  --el-border-color: var(--color-border);
+  --el-border-color-light: var(--color-border-light);
+  --el-border-color-lighter: var(--color-border-light);
+
+  --el-fill-color: var(--color-bg-secondary);
+  --el-fill-color-light: var(--color-bg-tertiary);
+  --el-fill-color-lighter: var(--color-bg-secondary);
+
+  --el-font-family: var(--font-family);
+  --el-font-size-base: var(--text-base);
+
+  --el-border-radius-base: var(--radius-md);
+  --el-border-radius-small: var(--radius-sm);
+
+  --el-box-shadow: var(--shadow-md);
+  --el-box-shadow-light: var(--shadow-sm);
+  --el-transition-duration: var(--duration-fast);
+}
+
+/* Dark theme Element Plus overrides */
+html[data-theme='dark'] {
+  --el-bg-color: var(--color-bg-primary);
+  --el-bg-color-page: var(--color-bg-secondary);
+  --el-bg-color-overlay: var(--color-bg-tertiary);
+
+  --el-text-color-primary: var(--color-text-primary);
+  --el-text-color-regular: var(--color-text-secondary);
+
+  --el-border-color: var(--color-border);
+  --el-border-color-light: var(--color-border-light);
+  --el-border-color-lighter: var(--color-border-light);
+
+  --el-fill-color: var(--color-bg-tertiary);
+  --el-fill-color-light: var(--color-bg-tertiary);
+  --el-fill-color-lighter: var(--color-bg-secondary);
+
+  --el-box-shadow: var(--shadow-md);
+  --el-box-shadow-light: var(--shadow-sm);
+}
+
+/* Apple-style rounded dialogs */
+.el-dialog {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid var(--color-border-light);
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* Apple-style rounded inputs */
+.el-input__wrapper {
+  border-radius: var(--radius-md) !important;
+  transition: box-shadow var(--duration-fast) var(--ease-out) !important;
+}
+
+.el-input__wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15), 0 0 0 1px var(--color-accent) inset !important;
+}
+
+/* Apple-style dropdowns / poppers */
+.el-popper.is-light {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-dropdown) !important;
+  border: 1px solid var(--color-border-light) !important;
+}
+
+/* Make Element Plus inputs match our design */
+html[data-theme='dark'] .el-input__wrapper {
+  background-color: var(--color-bg-input);
+  box-shadow: 0 0 0 1px var(--color-border) inset;
+}
+
+html[data-theme='dark'] .el-input__wrapper:hover {
+  box-shadow: 0 0 0 1px var(--color-border-focus) inset;
+}
+
+html[data-theme='dark'] .el-input__wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2), 0 0 0 1px var(--color-accent) inset !important;
+}
+
+/* Apple-style select dropdown */
+.el-select-dropdown {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Apple-style button transitions */
+.el-button {
+  border-radius: var(--radius-md) !important;
+  transition: all var(--duration-fast) var(--ease-out) !important;
+}
+
+.el-button:active {
+  transform: scale(0.97);
+}

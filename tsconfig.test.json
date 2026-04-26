@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "composite": false,
+    "rootDir": ".",
+    "outDir": "./out-test",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node", "electron-vite/node"],
+    "noEmitOnError": false
+  },
+  "include": [
+    "electron/http/variables/**/*.ts",
+    "test/**/*.ts"
+  ]
+}
