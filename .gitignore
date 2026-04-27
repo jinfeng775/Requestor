@@ -9,4 +9,5 @@ Thumbs.db
 *.local
 .env
 .env.*
-.claude
+.claude°ü/node_modules 
+dist.7z 
