@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { nanoid } from '@/utils/uuid'
 import { loadData, saveData, migrateFromLocalStorage } from '@/utils/storage'
+import { normalizeRequestConfig } from '@/utils/request-normalize'
 import type { HistoryEntry } from '@/types/history'
 import type { HttpRequestConfig, HttpResponseData } from '@/types/request'
 
@@ -25,7 +26,7 @@ export const useHistoryStore = defineStore('history', () => {
   ): void {
     const entry: HistoryEntry = {
       id: nanoid(),
-      request: { ...request },
+      request: normalizeRequestConfig(JSON.parse(JSON.stringify(request))),
       response: response
         ? {
             status: response.status,
@@ -68,7 +69,10 @@ export const useHistoryStore = defineStore('history', () => {
     await migrateFromLocalStorage(STORAGE_KEY, 'mypostman-history')
     const data = await loadData<HistoryEntry[]>(STORAGE_KEY, [])
     if (Array.isArray(data)) {
-      entries.value = data
+      entries.value = data.map((entry) => ({
+        ...entry,
+        request: normalizeRequestConfig(JSON.parse(JSON.stringify(entry.request)))
+      }))
     }
     loaded = true
   }

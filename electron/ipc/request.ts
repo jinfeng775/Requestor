@@ -1,6 +1,7 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import { IPC_CHANNELS } from '../../src/renderer/src/types/ipc'
-import { executeRequest } from '../http/engine'
+import { executeRequestWithScripts } from '../http/requestPipeline'
+import { confirmRequestScriptTrust } from '../http/scripts/trust'
 import type { HttpRequestConfig } from '../../src/renderer/src/types/request'
 
 /**
@@ -12,11 +13,20 @@ export function registerRequestIpc(): void {
     IPC_CHANNELS.REQUEST_SEND,
     async (_event, config: HttpRequestConfig, envVars: Record<string, string> = {}) => {
       try {
-        // 执行 HTTP 请求并传递环境变量
-        const result = await executeRequest(config, envVars)
-        return { success: true, data: result }
+        const owner = BrowserWindow.fromWebContents(_event.sender)
+        const result = await executeRequestWithScripts(config, envVars, {
+          trustScripts: (request, scriptHash, trustScope) =>
+            confirmRequestScriptTrust(owner, request, scriptHash, trustScope)
+        })
+        if (result.success) {
+          return { success: true, data: result.data }
+        }
+
+        return {
+          success: false,
+          error: result.error
+        }
       } catch (error: unknown) {
-        // 统一错误处理格式
         const err = error as { message: string; code?: string }
         return {
           success: false,

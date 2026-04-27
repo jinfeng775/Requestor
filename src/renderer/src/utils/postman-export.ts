@@ -21,11 +21,13 @@ interface PostmanCollection {
 }
 
 interface PostmanItem {
+  id?: string
   name: string
   description?: string
   item?: PostmanItem[] // 文件夹
   request?: PostmanRequest // 请求
   response?: PostmanResponse[] // 响应示例
+  event?: PostmanEvent[]
 }
 
 interface PostmanRequest {
@@ -51,6 +53,7 @@ interface PostmanKeyValue {
   value: string
   description?: string
   disabled?: boolean
+  type?: string
 }
 
 interface PostmanBody {
@@ -59,6 +62,16 @@ interface PostmanBody {
   options?: { raw: { language: string } }
   formdata?: PostmanFormDataEntry[]
   urlencoded?: PostmanKeyValue[]
+}
+
+interface PostmanScript {
+  type: 'text/javascript'
+  exec: string[]
+}
+
+interface PostmanEvent {
+  listen: 'prerequest' | 'test'
+  script: PostmanScript
 }
 
 interface PostmanFormDataEntry {
@@ -243,6 +256,29 @@ function mapRequest(config: HttpRequestConfig): PostmanRequest {
   return result
 }
 
+function mapRequestScripts(config: HttpRequestConfig): PostmanEvent[] {
+  const events: PostmanEvent[] = []
+  if (config.scripts.preRequest.trim()) {
+    events.push({
+      listen: 'prerequest',
+      script: {
+        type: 'text/javascript',
+        exec: config.scripts.preRequest.split('\n')
+      }
+    })
+  }
+  if (config.scripts.postRequest.trim()) {
+    events.push({
+      listen: 'test',
+      script: {
+        type: 'text/javascript',
+        exec: config.scripts.postRequest.split('\n')
+      }
+    })
+  }
+  return events
+}
+
 /** 将响应示例转换为 Postman response 对象 */
 function mapResponseExamples(item: CollectionRequest): PostmanResponse[] {
   if (!item.responseExamples || item.responseExamples.length === 0) return []
@@ -286,11 +322,13 @@ function mapFolder(folder: CollectionFolder): PostmanItem {
 
 /** 将内部请求项转换为 Postman item (请求) */
 function mapRequestItem(item: CollectionRequest): PostmanItem {
+  const event = mapRequestScripts(item.request)
   return {
     name: item.name,
     id: item.id,
     request: mapRequest(item.request),
-    response: mapResponseExamples(item)
+    response: mapResponseExamples(item),
+    ...(event.length ? { event } : {})
   }
 }
 

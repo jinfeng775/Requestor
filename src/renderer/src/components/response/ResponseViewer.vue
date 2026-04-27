@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useResponseStore } from '@/stores/response'
 import { FullScreen } from '@element-plus/icons-vue'
@@ -7,18 +7,34 @@ import ResponseMeta from './ResponseMeta.vue'
 import ResponseBody from './ResponseBody.vue'
 import ResponseHeaders from './ResponseHeaders.vue'
 import ResponseCookies from './ResponseCookies.vue'
+import ResponseScripts from './ResponseScripts.vue'
 
 const { t } = useI18n()
 const response = useResponseStore()
-const activeTab = ref('body') // 当前激活的标签页(body/headers/cookies)
+const activeTab = ref('body') // 当前激活的标签页(body/headers/cookies/scripts)
 const isFullscreen = ref(false) // 是否处于全屏模式
 
 /** 响应查看器的标签页配置 */
-const tabs = [
-  { key: 'body', labelKey: 'response.body' },
-  { key: 'headers', labelKey: 'response.headers' },
-  { key: 'cookies', labelKey: 'response.cookies' }
-]
+const tabs = computed(() => {
+  const scriptTab = { key: 'scripts', labelKey: 'scripts.title' }
+  if (response.data) {
+    return [
+      { key: 'body', labelKey: 'response.body' },
+      { key: 'headers', labelKey: 'response.headers' },
+      { key: 'cookies', labelKey: 'response.cookies' },
+      scriptTab
+    ]
+  }
+
+  return [scriptTab]
+})
+
+watch(
+  () => response.error,
+  (error) => {
+    if (error?.scriptReport) activeTab.value = 'scripts'
+  }
+)
 
 /** 切换全屏模式 */
 function toggleFullscreen(): void {
@@ -45,7 +61,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   <div :class="['response-viewer', { 'response-viewer--fullscreen': isFullscreen }]">
     <ResponseMeta />
 
-    <template v-if="response.hasResponse && !response.error">
+    <template v-if="response.hasResponse">
       <div class="response-viewer__tabs">
         <div class="response-viewer__tabs-left">
           <button
@@ -69,6 +85,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
         <ResponseBody v-if="activeTab === 'body'" />
         <ResponseHeaders v-else-if="activeTab === 'headers'" />
         <ResponseCookies v-else-if="activeTab === 'cookies'" />
+        <ResponseScripts v-else-if="activeTab === 'scripts'" />
       </div>
     </template>
 

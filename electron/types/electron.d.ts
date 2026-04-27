@@ -11,6 +11,7 @@ interface API {
   openJsonFile(): Promise<string | null>
   storageLoad(key: string): Promise<unknown>
   storageSave(key: string, data: unknown): Promise<boolean>
+  storageSize(key: string): Promise<number>
   readFile(filePath: string): Promise<{ success: boolean; content?: string; error?: string }>
   writeFile(filePath: string, content: string): Promise<{ success: boolean; error?: string }>
 }

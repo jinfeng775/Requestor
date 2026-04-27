@@ -176,7 +176,25 @@
     "importSuccess": "Import successful, {count} collection(s)",
     "importError": "Import failed, invalid file format",
     "postmanExportSuccess": "Postman export successful",
-    "htmlDocExportSuccess": "API documentation exported"
+    "htmlDocExportSuccess": "API documentation exported",
+    "preRequestScriptError": "Pre-request script failed",
+    "postRequestScriptError": "Post-request script failed"
+  },
+  "scripts": {
+    "title": "Scripts",
+    "preRequest": "Pre-request Script",
+    "postRequest": "Post-request Script",
+    "preRequestHelp": "Runs before the HTTP request. Use pw.request and pw.env to update the request or variables.",
+    "postRequestHelp": "Runs after the response. Use pw.response and pw.env to read response data and update variables.",
+    "environmentMutations": "Environment changes",
+    "requestMutations": "Request changes",
+    "trustConfirm": "This request contains scripts. Only run scripts you trust. Run and trust these scripts?",
+    "status": {
+      "skipped": "Skipped",
+      "passed": "Passed",
+      "failed": "Failed",
+      "timeout": "Timed out"
+    }
   },
   "globalSearch": {
     "title": "Global Search",

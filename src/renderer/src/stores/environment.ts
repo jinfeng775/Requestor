@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { nanoid } from '@/utils/uuid'
 import { loadData, saveData, migrateFromLocalStorage } from '@/utils/storage'
 import type { Environment, EnvironmentVariable } from '@/types/environment'
+import type { ScriptEnvironmentMutation } from '@/types/request'
 
 const STORAGE_KEY = 'requestor-environments'
 
@@ -87,6 +88,46 @@ export const useEnvironmentStore = defineStore('environment', () => {
     persist()
   }
 
+  function applyScriptMutations(mutations: ScriptEnvironmentMutation[]): void {
+    if (!activeEnvId.value || mutations.length === 0) return
+
+    environments.value = environments.value.map((env) => {
+      if (env.id !== activeEnvId.value) return env
+
+      const variables = mutations.reduce<EnvironmentVariable[]>((current, mutation) => {
+        const existingIndex = current.findIndex((variable) => variable.key === mutation.key)
+
+        if (mutation.action === 'disable') {
+          if (existingIndex === -1) return current
+          return current.map((variable, index) =>
+            index === existingIndex ? { ...variable, enabled: false } : variable
+          )
+        }
+
+        if (existingIndex === -1) {
+          return [
+            ...current,
+            {
+              key: mutation.key,
+              initialValue: '',
+              currentValue: mutation.value ?? '',
+              enabled: true
+            }
+          ]
+        }
+
+        return current.map((variable, index) =>
+          index === existingIndex
+            ? { ...variable, currentValue: mutation.value ?? '', enabled: true }
+            : variable
+        )
+      }, env.variables)
+
+      return { ...env, variables }
+    })
+    persist()
+  }
+
   /** 持久化到文件系统 */
   function persist(): void {
     if (!loaded) return
@@ -121,6 +162,7 @@ export const useEnvironmentStore = defineStore('environment', () => {
     addVariable,
     updateVariable,
     deleteVariable,
+    applyScriptMutations,
     loadFromDisk
   }
 })

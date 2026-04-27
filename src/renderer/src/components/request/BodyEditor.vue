@@ -30,12 +30,12 @@ const rawFormats: { value: RawBodyFormat; label: string }[] = [
  * 设置请求体类型
  * @param val 选中的请求体类型字符串
  */
-function setBodyType(val: string): void {
-  editor.updateRequest({ bodyType: val as BodyType })
+function setBodyType(val: string | number | boolean | undefined): void {
+  editor.updateRequest({ bodyType: String(val) as BodyType })
 }
 
-function setRawFormat(val: string): void {
-  editor.updateRequest({ rawBodyFormat: val as RawBodyFormat })
+function setRawFormat(val: string | number | boolean | undefined): void {
+  editor.updateRequest({ rawBodyFormat: String(val) as RawBodyFormat })
 }
 
 function onRawInput(e: Event): void {

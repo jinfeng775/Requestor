@@ -6,7 +6,7 @@ import { useEnvironmentStore } from '@/stores/environment'
 import { useCollectionStore } from '@/stores/collection'
 import { useToast } from '@/composables/useToast'
 import { nanoid } from '@/utils/uuid'
-import type { HttpRequestConfig, HttpResponseData } from '@/types/request'
+import type { HttpRequestConfig, HttpResponseData, RequestError } from '@/types/request'
 import type { ResponseExample } from '@/types/collection'
 
 /**
@@ -66,6 +66,9 @@ export function useRequest() {
 
       if (result.success && result.data) {
         const data = result.data as HttpResponseData
+        if (data.scriptReport?.environmentMutations.length) {
+          envStore.applyScriptMutations(data.scriptReport.environmentMutations)
+        }
         response.setData(data)
         history.addEntry(plainRequest, data)
 
@@ -95,15 +98,26 @@ export function useRequest() {
           // 清除 isDirty 标记，因为已经保存到集合
           editor.isDirty = false
         }
-        if (isSuccessfulStatus(data.status)) {
+        const postScriptFailed = data.scriptReport?.postRequest.status === 'failed' || data.scriptReport?.postRequest.status === 'timeout'
+        if (postScriptFailed) {
+          toast.error(t('toast.postRequestScriptError'))
+        } else if (isSuccessfulStatus(data.status)) {
           toast.success(t('toast.requestSuccess', { status: data.status }))
         } else {
           toast.error(t('toast.requestErrorStatus', { status: data.status }))
         }
       } else if (result.error) {
-        response.setError(result.error)
-        history.addEntry(plainRequest, null, result.error.message)
-        toast.error(t('toast.requestError', { message: result.error.message }))
+        const requestError = result.error as RequestError
+        if (requestError.scriptReport?.environmentMutations.length) {
+          envStore.applyScriptMutations(requestError.scriptReport.environmentMutations)
+        }
+        response.setError(requestError)
+        history.addEntry(plainRequest, null, requestError.message)
+        toast.error(
+          requestError.code === 'PRE_REQUEST_SCRIPT_ERROR' || requestError.code === 'PRE_REQUEST_SCRIPT_TIMEOUT'
+            ? t('toast.preRequestScriptError')
+            : t('toast.requestError', { message: requestError.message })
+        )
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Request failed'

@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { nanoid } from '@/utils/uuid'
 import { loadData, saveData, migrateFromLocalStorage } from '@/utils/storage'
-import type { Collection, CollectionRequest, ResponseExample } from '@/types/collection'
+import { normalizeRequestConfig } from '@/utils/request-normalize'
+import type { Collection, CollectionItem, CollectionRequest, ResponseExample } from '@/types/collection'
 import type { HttpRequestConfig } from '@/types/request'
 
 const STORAGE_KEY = 'requestor-collections'
@@ -57,7 +58,7 @@ export const useCollectionStore = defineStore('collection', () => {
       id: nanoid(),
       type: 'request',
       name,
-      request: JSON.parse(JSON.stringify(request))
+      request: normalizeRequestConfig(JSON.parse(JSON.stringify(request)))
     }
     collections.value = collections.value.map((c) => {
       if (c.id !== collectionId) return c
@@ -73,11 +74,15 @@ export const useCollectionStore = defineStore('collection', () => {
 
   /** 直接添加 CollectionRequest 对象 */
   function addRequestDirect(collectionId: string, item: CollectionRequest): void {
+    const normalizedItem: CollectionRequest = {
+      ...item,
+      request: normalizeRequestConfig(JSON.parse(JSON.stringify(item.request)))
+    }
     collections.value = collections.value.map((c) => {
       if (c.id !== collectionId) return c
       return {
         ...c,
-        items: [item, ...c.items],
+        items: [normalizedItem, ...c.items],
         updatedAt: Date.now()
       }
     })
@@ -112,21 +117,18 @@ export const useCollectionStore = defineStore('collection', () => {
    * @param request 新的请求配置
    */
   function updateRequestConfig(collectionId: string, itemId: string, request: HttpRequestConfig): void {
-    console.log('[DBG] updateRequestConfig called:', { collectionId, itemId, request })
     collections.value = collections.value.map((c) => {
       if (c.id !== collectionId) return c
       return {
         ...c,
         items: c.items.map((item) => {
           if (item.id !== itemId || item.type !== 'request') return item
-          console.log('[DBG] updateRequestConfig: updating item', item.id, 'old request:', item.request, 'new request:', request)
-          return { ...item, request: JSON.parse(JSON.stringify(request)) }
+          return { ...item, request: normalizeRequestConfig(JSON.parse(JSON.stringify(request))) }
         }),
         updatedAt: Date.now()
       }
     })
     persist()
-    console.log('[DBG] updateRequestConfig: collections after update:', collections.value)
   }
 
   /**
@@ -149,8 +151,14 @@ export const useCollectionStore = defineStore('collection', () => {
   }
 
   /** 从回收站恢复集合 */
-  function restore(collection: Collection): void {
-    collections.value = [...collections.value, collection]
+  function restore(collection: Collection, options: { trustScripts?: boolean } = {}): void {
+    collections.value = [
+      ...collections.value,
+      {
+        ...collection,
+        items: normalizeCollectionItems(collection.items, options)
+      }
+    ]
     persist()
   }
 
@@ -213,12 +221,31 @@ export const useCollectionStore = defineStore('collection', () => {
     persist()
   }
 
+  function normalizeCollectionItems(
+    items: CollectionItem[],
+    options: { trustScripts?: boolean } = {}
+  ): CollectionItem[] {
+    return items.map<CollectionItem>((item) => {
+      if (item.type === 'folder') {
+        return { ...item, items: normalizeCollectionItems(item.items, options) }
+      }
+
+      return {
+        ...item,
+        request: normalizeRequestConfig(JSON.parse(JSON.stringify(item.request)), options)
+      }
+    })
+  }
+
   /** 从文件系统加载集合数据 */
   async function loadFromDisk(): Promise<void> {
     await migrateFromLocalStorage(STORAGE_KEY, 'mypostman-collections')
     const data = await loadData<Collection[]>(STORAGE_KEY, [])
     if (Array.isArray(data)) {
-      collections.value = data
+      collections.value = data.map((collection) => ({
+        ...collection,
+        items: normalizeCollectionItems(collection.items)
+      }))
     }
     loaded = true
   }

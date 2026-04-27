@@ -6,19 +6,27 @@ import ParamsEditor from './ParamsEditor.vue'
 import HeadersEditor from './HeadersEditor.vue'
 import BodyEditor from './BodyEditor.vue'
 import AuthEditor from './AuthEditor.vue'
+import ScriptsEditor from './ScriptsEditor.vue'
 
 const { t } = useI18n()
 const editor = useRequestEditorStore()
 
-const activeTab = ref('params') // 当前激活的标签页(params/headers/body/auth)
+const activeTab = ref('params') // 当前激活的标签页(params/headers/body/auth/scripts)
 
 /** 请求构建器的标签页配置 */
 const tabs = [
   { key: 'params', labelKey: 'request.params' },
   { key: 'headers', labelKey: 'request.headers' },
   { key: 'body', labelKey: 'request.body' },
-  { key: 'auth', labelKey: 'request.auth' }
+  { key: 'auth', labelKey: 'request.auth' },
+  { key: 'scripts', labelKey: 'scripts.title' }
 ]
+
+function updateDescription(event: Event): void {
+  const target = event.target
+  if (!(target instanceof HTMLInputElement)) return
+  editor.updateRequest({ description: target.value })
+}
 </script>
 
 <template>
@@ -28,7 +36,7 @@ const tabs = [
         class="request-builder__desc-input"
         :value="editor.activeRequest.description"
         :placeholder="t('request.description')"
-        @input="editor.updateRequest({ description: $event.target.value })"
+        @input="updateDescription"
       />
     </div>
     <div class="request-builder__tabs">
@@ -46,6 +54,7 @@ const tabs = [
       <HeadersEditor v-else-if="activeTab === 'headers'" />
       <BodyEditor v-else-if="activeTab === 'body'" />
       <AuthEditor v-else-if="activeTab === 'auth'" />
+      <ScriptsEditor v-else-if="activeTab === 'scripts'" />
     </div>
   </div>
 </template>

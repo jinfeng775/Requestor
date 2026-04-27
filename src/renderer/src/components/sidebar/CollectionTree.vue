@@ -25,7 +25,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import draggable from 'vuedraggable'
 import { collectionToPostmanV21 } from '@/utils/postman-export'
 import { collectionToHtmlDoc } from '@/utils/html-doc-export'
-import type { CollectionRequest } from '@/types/collection'
+import type { CollectionItem, CollectionRequest } from '@/types/collection'
 
 const { t } = useI18n()
 const collectionStore = useCollectionStore()
@@ -35,6 +35,10 @@ const editor = useRequestEditorStore()
 const response = useResponseStore()
 const tabStore = useTabStore()
 const toast = useToast()
+
+function isCollectionRequest(item: CollectionItem): item is CollectionRequest {
+  return item.type === 'request'
+}
 
 /** 已展开的集合 ID 集合 */
 const expandedIds = ref<Set<string>>(new Set())
@@ -308,7 +312,7 @@ async function confirmDeleteItem(collectionId: string, itemId: string): Promise<
     // Find the item and collection name before deleting
     const col = collectionStore.collections.find((c) => c.id === collectionId)
     const item = col?.items.find((i) => i.id === itemId)
-    if (col && item) {
+    if (col && item && isCollectionRequest(item)) {
       itemTrashStore.trashItem(item, collectionId, col.name) // 移入项回收站
     }
     collectionStore.deleteItem(collectionId, itemId)
@@ -342,7 +346,7 @@ async function confirmBatchDelete(): Promise<void> {
         // 是请求项,需要先找到所属集合,再移入项回收站
         for (const c of collectionStore.collections) {
           const item = c.items.find((i) => i.id === id)
-          if (item) {
+          if (item && isCollectionRequest(item)) {
             itemTrashStore.trashItem(item, c.id, c.name)
             collectionStore.deleteItem(c.id, id)
             break
@@ -445,14 +449,14 @@ async function importCollections(): Promise<void> {
     return
   }
   try {
-    const parsed = JSON.parse(result.content)
+    const parsed = JSON.parse(result.content ?? '')
     if (!Array.isArray(parsed)) {
       toast.error(t('toast.importError'))
       return
     }
     for (const col of parsed) {
       if (col.id && col.name && Array.isArray(col.items)) {
-        collectionStore.restore(col) // 恢复集合(如果已存在则跳过)
+        collectionStore.restore(col, { trustScripts: false }) // 恢复集合(如果已存在则跳过)
         expandedIds.value.add(col.id) // 自动展开导入的集合
       }
     }

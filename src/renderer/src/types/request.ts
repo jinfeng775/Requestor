@@ -18,6 +18,56 @@ export type RawBodyFormat = 'json' | 'text' | 'xml' | 'html'
 /** 认证类型 */
 export type AuthType = 'none' | 'bearer' | 'basic' | 'apikey'
 
+export type ScriptPhase = 'pre-request' | 'post-request'
+export type ScriptLogLevel = 'log' | 'info' | 'warn' | 'error'
+export type ScriptExecutionStatus = 'skipped' | 'passed' | 'failed' | 'timeout'
+export type ScriptEnvironmentMutationAction = 'set' | 'disable'
+
+export interface RequestScripts {
+  preRequest: string
+  postRequest: string
+  trusted: boolean
+}
+
+export interface ScriptLogEntry {
+  level: ScriptLogLevel
+  message: string
+  timestamp: number
+}
+
+export interface ScriptExecutionError {
+  message: string
+  stack?: string
+}
+
+export interface ScriptEnvironmentMutation {
+  action: ScriptEnvironmentMutationAction
+  key: string
+  value?: string
+}
+
+export interface ScriptRequestMutationSummary {
+  field: 'method' | 'url' | 'rawBody' | 'headers' | 'params'
+  action?: 'set' | 'unset'
+  key?: string
+}
+
+export interface ScriptExecutionResult {
+  status: ScriptExecutionStatus
+  logs: ScriptLogEntry[]
+  durationMs: number
+  error?: ScriptExecutionError
+}
+
+export interface ScriptExecutionReport {
+  preRequest: ScriptExecutionResult
+  postRequest: ScriptExecutionResult
+  environmentMutations: ScriptEnvironmentMutation[]
+  requestMutations: ScriptRequestMutationSummary[]
+  effectiveRequest?: Pick<HttpRequestConfig, 'method' | 'url'>
+  requiresTrust?: boolean
+}
+
 /** 键值对数据结构,用于 Headers、Params 等 */
 export interface KeyValue {
   key: string
@@ -67,6 +117,7 @@ export interface HttpRequestConfig {
   binaryFilePath: string // 二进制文件路径
   authType: AuthType // 认证类型
   auth: BearerAuth | BasicAuth | ApiKeyAuth | null // 认证信息
+  scripts: RequestScripts // 请求级脚本
 }
 
 /** HTTP 响应数据接口 */
@@ -81,12 +132,14 @@ export interface HttpResponseData {
   contentType: string // Content-Type
   cookies: Array<{ name: string; value: string; domain: string; path: string }> // Cookies
   variableWarnings?: VariableWarning[] // 变量解析警告
+  scriptReport?: ScriptExecutionReport
 }
 
 /** 请求错误信息 */
 export interface RequestError {
   message: string
   code?: string
+  scriptReport?: ScriptExecutionReport
 }
 
 /** 默认请求配置 */
@@ -105,5 +158,10 @@ export const DEFAULT_REQUEST: HttpRequestConfig = {
   urlEncodedData: [],
   binaryFilePath: '',
   authType: 'none',
-  auth: null
+  auth: null,
+  scripts: {
+    preRequest: '',
+    postRequest: '',
+    trusted: true
+  }
 }

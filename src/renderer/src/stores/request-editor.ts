@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { nanoid } from '@/utils/uuid'
 import type { HttpRequestConfig, HttpMethod } from '@/types/request'
 import { DEFAULT_REQUEST } from '@/types/request'
+import { normalizeRequestConfig } from '@/utils/request-normalize'
 
 /**
  * 请求编辑器状态管理
@@ -57,7 +58,7 @@ export const useRequestEditorStore = defineStore('request-editor', () => {
    * 创建新的空请求(重置编辑器)
    */
   function newRequest(): void {
-    activeRequest.value = { ...DEFAULT_REQUEST, id: nanoid() }
+    activeRequest.value = normalizeRequestConfig({ ...DEFAULT_REQUEST, id: nanoid() })
     isDirty.value = false
     sourceCollectionId.value = null
     sourceItemId.value = null
@@ -71,7 +72,7 @@ export const useRequestEditorStore = defineStore('request-editor', () => {
    * @param itemId 来源集合项 ID(从集合加载时传入)
    */
   function loadRequest(config: HttpRequestConfig, collectionId?: string, itemId?: string): void {
-    activeRequest.value = JSON.parse(JSON.stringify(config))
+    activeRequest.value = normalizeRequestConfig(JSON.parse(JSON.stringify(config)))
     isDirty.value = false
     sourceCollectionId.value = collectionId || null
     sourceItemId.value = itemId || null

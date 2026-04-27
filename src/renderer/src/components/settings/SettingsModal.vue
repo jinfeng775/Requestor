@@ -17,17 +17,18 @@ const visible = defineModel<boolean>('visible', { default: false })
  * 主题切换处理函数
  * @param v 选中的主题值('light' | 'dark' | 'auto')
  */
-function onThemeChange(v: string): void {
-  setTheme(v as 'light' | 'dark' | 'auto')
-  savedTheme.value = v
+function onThemeChange(v: string | number | boolean | undefined): void {
+  const nextTheme = String(v) as 'light' | 'dark' | 'auto'
+  setTheme(nextTheme)
+  savedTheme.value = nextTheme
 }
 
 /**
  * 语言切换处理函数
  * @param v 选中的语言代码('zh-CN' | 'en-US')
  */
-function onLanguageChange(v: string): void {
-  setLanguage(v as 'zh-CN' | 'en-US')
+function onLanguageChange(v: string | number | boolean | undefined): void {
+  setLanguage(String(v) as 'zh-CN' | 'en-US')
 }
 </script>
 

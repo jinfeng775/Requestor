@@ -1,46 +1,8 @@
 {
   "permissions": {
+    "defaultMode": "bypassPermissions",
     "allow": [
-      "Bash(git init *)",
-      "Bash(git add *)",
-      "Bash(git commit *)",
-      "Bash(npm install *)",
-      "Bash(npm config *)",
-      "Bash(ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ npm install)",
-      "Bash(npx electron-vite *)",
-      "Bash(rm -rf src/renderer/src/renderer)",
-      "Bash(rm -rf out)",
-      "Bash(rm -f src/renderer/auto-imports.d.ts)",
-      "Bash(node -e ' *)",
-      "Bash(node test-curl.mjs)",
-      "Bash(npm run *)",
-      "Bash(taskkill //f //im electron-builder.exe)",
-      "Bash(taskkill //f //im node.exe)",
-      "Bash(ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\" npm run build:win)",
-      "Bash(ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\" ELECTRON_BUILDER_BINARIES_MIRROR=\"https://npmmirror.com/mirrors/electron-builder-binaries/\" npm run build:win)",
-      "Bash(ELECTRON_MIRROR=\"https://npmmirror.com/mirrors/electron/\" ELECTRON_BUILDER_BINARIES_MIRROR=\"https://npmmirror.com/mirrors/electron-builder-binaries/\" npm run build:portable)",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('d:/CODE/mypostman/src/renderer/src/i18n/locales/zh-CN.json','utf8'\\)\\); console.log\\('zh-CN OK'\\)\")",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('d:/CODE/mypostman/src/renderer/src/i18n/locales/en-US.json','utf8'\\)\\); console.log\\('en-US OK'\\)\")",
-      "Bash(npx tsc *)",
-      "WebSearch",
-      "WebFetch(domain:schema.getpostman.com)",
-      "WebFetch(domain:github.com)",
-      "Bash(node --test \"out-test/test/**/*.test.js\")",
-      "Bash(git -C \"/d/CODE/mypostman\" status --short)",
-      "Bash(git -C \"/d/CODE/mypostman\" diff -- \"electron/http/engine.ts\" \"src/renderer/src/composables/useRequest.ts\" \"package.json\" \"tsconfig.test.json\")",
-      "Bash(git -C \"/d/CODE/mypostman\" diff --staged)",
-      "Bash(git -C \"/d/CODE/mypostman\" diff)",
-      "Bash(git -C \"/d/CODE/mypostman\" diff -- \"electron/http/engine.ts\" \"src/renderer/src/types/request.ts\" \"electron/http/variables\")",
-      "Bash(npx eslint *)",
-      "Bash(git -C \"D:/CODE/mypostman/.claude/worktrees/agent-a073811f25b057127\" diff --staged -- \"src/renderer/src/composables/useRequest.ts\" \"src/renderer/src/i18n/locales/zh-CN.json\" \"src/renderer/src/i18n/locales/en-US.json\")",
-      "Bash(git -C \"D:/CODE/mypostman/.claude/worktrees/agent-a073811f25b057127\" diff -- \"src/renderer/src/composables/useRequest.ts\" \"src/renderer/src/i18n/locales/zh-CN.json\" \"src/renderer/src/i18n/locales/en-US.json\")",
-      "Bash(git -C /d/CODE/mypostman diff --staged -- src/renderer/src/composables/useRequest.ts src/renderer/src/i18n/locales/zh-CN.json src/renderer/src/i18n/locales/en-US.json)",
-      "Bash(git -C /d/CODE/mypostman diff -- src/renderer/src/composables/useRequest.ts src/renderer/src/i18n/locales/zh-CN.json src/renderer/src/i18n/locales/en-US.json)",
-      "Bash(npm test *)",
-      "Bash(git -C /d/CODE/mypostman diff --staged -- src/renderer/src/composables/useRequest.ts src/renderer/src/components/request/UrlInput.vue src/renderer/src/i18n/locales/zh-CN.json src/renderer/src/i18n/locales/en-US.json)",
-      "Bash(git -C /d/CODE/mypostman diff -- src/renderer/src/composables/useRequest.ts src/renderer/src/components/request/UrlInput.vue src/renderer/src/i18n/locales/zh-CN.json src/renderer/src/i18n/locales/en-US.json)",
-      "Bash(git -C \"/d/CODE/mypostman\" diff -- \"electron/http/engine.ts\" \"electron/http/variables/types.ts\" \"src/renderer/src/types/request.ts\")",
-      "Bash(git -C \"/d/CODE/mypostman\" diff --name-only)"
+      "Bash(npm test *)"
     ]
   }
 }

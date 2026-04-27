@@ -176,7 +176,25 @@
     "importSuccess": "导入成功，共 {count} 个集合",
     "importError": "导入失败，文件格式错误",
     "postmanExportSuccess": "Postman 导出成功",
-    "htmlDocExportSuccess": "API 文档导出成功"
+    "htmlDocExportSuccess": "API 文档导出成功",
+    "preRequestScriptError": "预请求脚本执行失败",
+    "postRequestScriptError": "请求后脚本执行失败"
+  },
+  "scripts": {
+    "title": "脚本",
+    "preRequest": "预请求脚本",
+    "postRequest": "请求后脚本",
+    "preRequestHelp": "在 HTTP 请求发送前执行。可使用 pw.request 和 pw.env 修改请求或变量。",
+    "postRequestHelp": "在收到响应后执行。可使用 pw.response 和 pw.env 读取响应并更新变量。",
+    "environmentMutations": "环境变量变更",
+    "requestMutations": "请求变更",
+    "trustConfirm": "此请求包含脚本。请只运行你信任的脚本。是否运行并信任这些脚本？",
+    "status": {
+      "skipped": "已跳过",
+      "passed": "已通过",
+      "failed": "失败",
+      "timeout": "超时"
+    }
   },
   "globalSearch": {
     "title": "全局搜索",
