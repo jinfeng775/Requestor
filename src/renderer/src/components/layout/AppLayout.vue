@@ -6,6 +6,7 @@ import { useSidebarStore } from '@/stores/sidebar'
 import { useTabStore } from '@/stores/tab'
 import { useRequestEditorStore } from '@/stores/request-editor'
 import { useResponseStore } from '@/stores/response'
+import { useWorkspaceStore } from '@/stores/workspace'
 import TitleBar from './TitleBar.vue'
 import StatusBar from './StatusBar.vue'
 import TabBar from './TabBar.vue'
@@ -15,6 +16,7 @@ import HorizontalResizeHandle from '../common/HorizontalResizeHandle.vue'
 import UrlInput from '../request/UrlInput.vue'
 import RequestBuilder from '../request/RequestBuilder.vue'
 import ResponseViewer from '../response/ResponseViewer.vue'
+import RealtimeWorkspace from '../realtime/RealtimeWorkspace.vue'
 
 const { t } = useI18n()
 const settings = useAppSettingsStore()
@@ -22,12 +24,12 @@ const sidebarStore = useSidebarStore()
 const tabStore = useTabStore()
 const editor = useRequestEditorStore()
 const response = useResponseStore()
+const workspaceStore = useWorkspaceStore()
 
-// 跟踪上一个标签页 ID,用于在切换前保存编辑器状态
 let previousTabId: string | null = null
 
 function saveEditorToTab(tabId: string | null): void {
-  if (!tabId) return
+  if (!tabId || workspaceStore.isRealtime) return
   const found = tabStore.tabs.find((tb) => tb.id === tabId)
   if (found) {
     tabStore.updateTabRequest(tabId, editor.activeRequest)
@@ -35,7 +37,7 @@ function saveEditorToTab(tabId: string | null): void {
 }
 
 function loadTabToEditor(tabId: string | null): void {
-  if (!tabId) return
+  if (!tabId || workspaceStore.isRealtime) return
   const found = tabStore.tabs.find((tb) => tb.id === tabId)
   if (found) {
     editor.loadRequest(found.request)
@@ -43,7 +45,6 @@ function loadTabToEditor(tabId: string | null): void {
   }
 }
 
-// When active tab changes: save old tab, load new tab
 watch(
   () => tabStore.activeTabId,
   (newId) => {
@@ -55,11 +56,11 @@ watch(
   }
 )
 
-// When editor changes: update active tab's request (debounced)
 let syncTimer: ReturnType<typeof setTimeout> | null = null
 watch(
   () => editor.activeRequest,
   () => {
+    if (workspaceStore.isRealtime) return
     if (syncTimer) clearTimeout(syncTimer)
     syncTimer = setTimeout(() => {
       if (tabStore.activeTabId) {
@@ -106,17 +107,22 @@ const responseStyle = computed(() => {
       </div>
       <ResizeHandle v-show="!sidebarStore.collapsed" @resize="onSidebarResize" />
       <div class="app-layout__main">
-        <TabBar />
-        <UrlInput />
-        <div class="app-layout__panels">
-          <div class="app-layout__request" :style="requestStyle">
-            <RequestBuilder />
+        <template v-if="workspaceStore.isRealtime">
+          <RealtimeWorkspace />
+        </template>
+        <template v-else>
+          <TabBar />
+          <UrlInput />
+          <div class="app-layout__panels">
+            <div class="app-layout__request" :style="requestStyle">
+              <RequestBuilder />
+            </div>
+            <HorizontalResizeHandle @resize="onPanelResize" />
+            <div class="app-layout__response" :style="responseStyle">
+              <ResponseViewer />
+            </div>
           </div>
-          <HorizontalResizeHandle @resize="onPanelResize" />
-          <div class="app-layout__response" :style="responseStyle">
-            <ResponseViewer />
-          </div>
-        </div>
+        </template>
       </div>
     </div>
     <StatusBar />

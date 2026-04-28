@@ -11,6 +11,7 @@
   },
   "include": [
     "electron/http/variables/**/*.ts",
+    "electron/realtime/**/*.ts",
     "test/**/*.ts"
   ]
 }

@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerRequestIpc } from './ipc/request'
 import { registerDialogIpc } from './ipc/dialog'
 import { registerStorageIpc } from './ipc/storage'
+import { disconnectAllRealtimeSessions, registerRealtimeIpc } from './ipc/realtime'
 
 /**
  * 创建主窗口并配置安全选项
@@ -66,6 +67,7 @@ app.whenReady().then(() => {
   registerRequestIpc() // HTTP 请求相关
   registerDialogIpc() // 文件对话框相关
   registerStorageIpc() // 持久化存储相关
+  registerRealtimeIpc() // Realtime 占位能力
 
   // 创建主窗口
   createWindow()
@@ -80,6 +82,7 @@ app.whenReady().then(() => {
 
 // 所有窗口关闭时的处理
 app.on('window-all-closed', () => {
+  disconnectAllRealtimeSessions()
   // macOS 除外:保持应用运行,直到用户主动退出
   if (process.platform !== 'darwin') {
     app.quit()

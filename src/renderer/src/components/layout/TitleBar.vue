@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTheme, useLanguage } from '@/composables/useTheme'
 import { useSidebarStore } from '@/stores/sidebar'
+import { useWorkspaceStore } from '@/stores/workspace'
 import { Sunny, Moon, Setting, Expand, Fold, Search } from '@element-plus/icons-vue'
 import SettingsModal from '../settings/SettingsModal.vue'
 import GlobalSearch from '../common/GlobalSearch.vue'
@@ -11,14 +12,10 @@ const { t } = useI18n()
 const { isDark, toggle: toggleTheme } = useTheme()
 const { toggleLanguage, language } = useLanguage()
 const sidebarStore = useSidebarStore()
-const showSettings = ref(false) // 是否显示设置对话框
-const showSearch = ref(false) // 是否显示全局搜索对话框
+const workspaceStore = useWorkspaceStore()
+const showSettings = ref(false)
+const showSearch = ref(false)
 
-/**
- * 全局键盘事件监听器
- * Ctrl/Cmd + K 打开全局搜索
- * @param e 键盘事件对象
- */
 function onKeydown(e: KeyboardEvent): void {
   const ctrl = e.ctrlKey || e.metaKey
   if (ctrl && e.key === 'k') {
@@ -27,7 +24,6 @@ function onKeydown(e: KeyboardEvent): void {
   }
 }
 
-// 组件挂载时添加全局键盘监听,卸载时移除(防止内存泄漏)
 onMounted(() => document.addEventListener('keydown', onKeydown))
 onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 </script>
@@ -48,6 +44,20 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
       <span class="titlebar__title">{{ t('app.name') }}</span>
     </div>
     <div class="titlebar__actions">
+      <div class="titlebar__workspace-switch">
+        <button
+          :class="['titlebar__workspace-btn', { 'titlebar__workspace-btn--active': workspaceStore.activeWorkspace === 'http' }]"
+          @click="workspaceStore.setWorkspace('http')"
+        >
+          {{ t('workspace.http') }}
+        </button>
+        <button
+          :class="['titlebar__workspace-btn', { 'titlebar__workspace-btn--active': workspaceStore.activeWorkspace === 'realtime' }]"
+          @click="workspaceStore.setWorkspace('realtime')"
+        >
+          {{ t('workspace.realtime') }}
+        </button>
+      </div>
       <button
         class="titlebar__btn"
         :title="t('globalSearch.title') + ' (Ctrl+K)'"
@@ -130,6 +140,30 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
   align-items: center;
   gap: var(--space-xs);
   -webkit-app-region: no-drag;
+}
+
+.titlebar__workspace-switch {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  margin-right: var(--space-sm);
+}
+
+.titlebar__workspace-btn {
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.titlebar__workspace-btn--active {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 .titlebar__btn {

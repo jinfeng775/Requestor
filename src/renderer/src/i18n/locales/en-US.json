@@ -44,6 +44,26 @@
     "trash": "Trash",
     "emptyTrash": "Trash is empty"
   },
+  "workspace": {
+    "http": "HTTP",
+    "realtime": "Realtime"
+  },
+  "realtime": {
+    "endpoint": "Endpoint",
+    "namespace": "Namespace",
+    "eventName": "Event name",
+    "clientId": "Client ID",
+    "publishTopic": "Publish topic",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "sendMessage": "Send",
+    "subscribe": "Subscribe",
+    "clearLog": "Clear log",
+    "emptyLog": "Connect to start viewing realtime events",
+    "sessionStatus": "Session",
+    "messagePlaceholder": "Enter a message payload",
+    "subscriptionPlaceholder": "Enter a topic or event"
+  },
   "request": {
     "method": "Method",
     "url": "Enter request URL",

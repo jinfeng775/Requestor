@@ -3,6 +3,7 @@
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "target": "ES2020",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
@@ -14,6 +15,7 @@
     "electron.vite.config.*",
     "electron/**/*",
     "src/renderer/src/types/ipc.ts",
-    "src/renderer/src/types/request.ts"
+    "src/renderer/src/types/request.ts",
+    "src/renderer/src/types/realtime.ts"
   ]
 }
