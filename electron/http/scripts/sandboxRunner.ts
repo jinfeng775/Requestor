@@ -103,9 +103,18 @@ function createSandboxHtml(): string {
         state.logs.push({ level, message, timestamp: Date.now() });
       }
 
+      function getPendingKeyValueMutation(collection, name) {
+        const key = String(name).toLowerCase();
+        const mutations = state.request[collection] || [];
+        return [...mutations].reverse().find((mutation) => mutation.key.toLowerCase() === key);
+      }
+
       function createKeyValueApi(list, collection) {
         return {
           get(name) {
+            const pending = getPendingKeyValueMutation(collection, name);
+            if (pending && pending.action === 'unset') return undefined;
+            if (pending && pending.action === 'set') return pending.value;
             const item = list.find((entry) => entry.enabled && entry.key.toLowerCase() === String(name).toLowerCase());
             return item && item.value;
           },
@@ -225,7 +234,12 @@ export const runScript: ScriptRunner = async (context): Promise<ScriptRunnerResu
     return createErrorResult(startedAt, new Error('Script exceeded size limit'))
   }
 
-  const boundedContext = createBoundedContext(context)
+  let boundedContext: Parameters<ScriptRunner>[0]
+  try {
+    boundedContext = createBoundedContext(context)
+  } catch (error: unknown) {
+    return createErrorResult(startedAt, error)
+  }
 
   const { BrowserWindow, session } = await loadElectron()
   const partition = `requestor-script-sandbox-${randomUUID()}`
@@ -246,18 +260,20 @@ export const runScript: ScriptRunner = async (context): Promise<ScriptRunnerResu
   sandboxWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
   sandboxWindow.webContents.on('will-navigate', (event) => event.preventDefault())
 
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined
   try {
     await sandboxWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(createSandboxHtml())}`)
     const script = `window.__runRequestorScript(${JSON.stringify(boundedContext)})`
     const resultPromise = sandboxWindow.webContents.executeJavaScript(script, true) as Promise<ScriptRunnerResult>
     const timeoutPromise = new Promise<ScriptRunnerResult>((resolve) => {
-      setTimeout(() => resolve(createTimeoutResult(startedAt)), SCRIPT_TIMEOUT_MS)
+      timeoutHandle = setTimeout(() => resolve(createTimeoutResult(startedAt)), SCRIPT_TIMEOUT_MS)
     })
     const result = await Promise.race([resultPromise, timeoutPromise])
     return validateRunnerResult(startedAt, result)
   } catch (error: unknown) {
     return createErrorResult(startedAt, error)
   } finally {
+    if (timeoutHandle !== undefined) clearTimeout(timeoutHandle)
     if (!sandboxWindow.isDestroyed()) sandboxWindow.destroy()
   }
 }

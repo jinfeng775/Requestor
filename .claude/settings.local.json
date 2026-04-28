@@ -1,8 +1,9 @@
 {
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "allow": [
-      "Bash(npm test *)"
-    ]
+      "Bash(npm test *)",
+      "Bash(npm run *)"
+    ],
+    "defaultMode": "bypassPermissions"
   }
 }

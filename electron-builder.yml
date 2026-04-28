@@ -4,6 +4,8 @@ directories:
   buildResources: build
 files:
   - '!**/.vscode/*'
+  - '!**/.claude/**'
+  - '!**/包/**'
   - '!src/*'
   - '!electron/*'
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc,dev-app-update.yml,CHANGELOG.md,README.md}'

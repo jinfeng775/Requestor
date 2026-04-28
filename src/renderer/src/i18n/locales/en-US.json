@@ -189,6 +189,20 @@
     "environmentMutations": "Environment changes",
     "requestMutations": "Request changes",
     "trustConfirm": "This request contains scripts. Only run scripts you trust. Run and trust these scripts?",
+    "snippets": {
+      "quickInsert": "Quick insert",
+      "items": {
+        "setEnv": "Set variable",
+        "setTimestamp": "Set timestamp",
+        "setRandomNumber": "Set random number",
+        "setHeader": "Set header",
+        "setQueryParam": "Set query",
+        "saveJsonField": "Save JSON field",
+        "saveStatusCode": "Save status",
+        "saveHeader": "Save response header",
+        "logResponse": "Log response"
+      }
+    },
     "status": {
       "skipped": "Skipped",
       "passed": "Passed",

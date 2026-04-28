@@ -189,6 +189,20 @@
     "environmentMutations": "环境变量变更",
     "requestMutations": "请求变更",
     "trustConfirm": "此请求包含脚本。请只运行你信任的脚本。是否运行并信任这些脚本？",
+    "snippets": {
+      "quickInsert": "快速插入",
+      "items": {
+        "setEnv": "设置变量",
+        "setTimestamp": "设置时间戳",
+        "setRandomNumber": "设置随机数",
+        "setHeader": "设置请求头",
+        "setQueryParam": "设置查询参数",
+        "saveJsonField": "保存 JSON 字段",
+        "saveStatusCode": "保存状态码",
+        "saveHeader": "保存响应头",
+        "logResponse": "打印响应日志"
+      }
+    },
     "status": {
       "skipped": "已跳过",
       "passed": "已通过",
