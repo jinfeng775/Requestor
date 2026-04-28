@@ -7,10 +7,16 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "types": ["node", "electron-vite/node"],
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/renderer/src/*"]
+    }
   },
   "include": [
     "electron/http/variables/**/*.ts",
+    "src/renderer/src/types/**/*.ts",
+    "src/renderer/src/utils/postman-*.ts",
     "test/**/*.ts"
   ]
 }

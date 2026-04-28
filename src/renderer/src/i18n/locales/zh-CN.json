@@ -175,6 +175,8 @@
     "exportSuccess": "导出成功",
     "importSuccess": "导入成功，共 {count} 个集合",
     "importError": "导入失败，文件格式错误",
+    "postmanImportSuccess": "Postman 导入成功，共 {count} 个集合",
+    "postmanImportError": "Postman 导入失败，文件格式错误",
     "postmanExportSuccess": "Postman 导出成功",
     "htmlDocExportSuccess": "API 文档导出成功",
     "preRequestScriptError": "预请求脚本执行失败",
@@ -232,6 +234,8 @@
     "addExample": "添加示例",
     "deleteExample": "删除示例",
     "noExamples": "暂无响应示例",
+    "postmanMenu": "Postman 导入/导出",
+    "importPostman": "导入 Postman Collection",
     "exportPostman": "导出为 Postman JSON",
     "exportHtmlDoc": "导出 API 文档"
   },

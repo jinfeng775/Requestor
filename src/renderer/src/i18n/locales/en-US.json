@@ -175,6 +175,8 @@
     "exportSuccess": "Export successful",
     "importSuccess": "Import successful, {count} collection(s)",
     "importError": "Import failed, invalid file format",
+    "postmanImportSuccess": "Postman import successful, {count} collection(s)",
+    "postmanImportError": "Postman import failed, invalid file format",
     "postmanExportSuccess": "Postman export successful",
     "htmlDocExportSuccess": "API documentation exported",
     "preRequestScriptError": "Pre-request script failed",
@@ -232,6 +234,8 @@
     "addExample": "Add Example",
     "deleteExample": "Delete Example",
     "noExamples": "No response examples",
+    "postmanMenu": "Postman Import/Export",
+    "importPostman": "Import Postman Collection",
     "exportPostman": "Export as Postman JSON",
     "exportHtmlDoc": "Export API Documentation"
   },

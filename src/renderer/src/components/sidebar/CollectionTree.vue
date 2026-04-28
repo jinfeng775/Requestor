@@ -15,8 +15,6 @@ import {
   Select,
   DocumentCopy,
   Position,
-  Upload,
-  Download,
   Document,
   Tickets
 } from '@element-plus/icons-vue'
@@ -25,6 +23,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import draggable from 'vuedraggable'
 import { collectionToPostmanV21 } from '@/utils/postman-export'
 import { collectionToHtmlDoc } from '@/utils/html-doc-export'
+import { parsePostmanCollections } from '@/utils/postman-import'
 import type { CollectionItem, CollectionRequest } from '@/types/collection'
 
 const { t } = useI18n()
@@ -220,7 +219,6 @@ function loadRequest(collectionId: string, itemId: string): void {
 
   editor.loadRequest(item.request, collectionId, item.id)
   const examples = item.responseExamples
-  console.log('[DBG] loadRequest: item', item.id, 'examples count:', examples?.length ?? 0, 'collectionId:', collectionId, 'editor.source after load:', editor.sourceCollectionId, editor.sourceItemId)
   if (examples && examples.length > 0) {
     const latest = examples[0]
     response.setData({
@@ -309,11 +307,10 @@ async function confirmDeleteItem(collectionId: string, itemId: string): Promise<
       cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
-    // Find the item and collection name before deleting
     const col = collectionStore.collections.find((c) => c.id === collectionId)
     const item = col?.items.find((i) => i.id === itemId)
     if (col && item && isCollectionRequest(item)) {
-      itemTrashStore.trashItem(item, collectionId, col.name) // 移入项回收站
+      itemTrashStore.trashItem(item, collectionId, col.name)
     }
     collectionStore.deleteItem(collectionId, itemId)
     closeContextMenu()
@@ -335,15 +332,11 @@ async function confirmBatchDelete(): Promise<void> {
       type: 'warning'
     })
     for (const id of selectedIds.value) {
-      // Check if ID belongs to a collection
       const col = collectionStore.collections.find((c) => c.id === id)
       if (col) {
-        // 是集合,直接删除并移入集合回收站
         const deleted = collectionStore.deleteCollection(id)
         if (deleted) trashStore.trashCollection(deleted)
       } else {
-        // ID belongs to an item — find its parent collection, trash it, then delete
-        // 是请求项,需要先找到所属集合,再移入项回收站
         for (const c of collectionStore.collections) {
           const item = c.items.find((i) => i.id === id)
           if (item && isCollectionRequest(item)) {
@@ -354,7 +347,7 @@ async function confirmBatchDelete(): Promise<void> {
         }
       }
     }
-    exitSelectMode() // 删除完成后退出批量选择模式
+    exitSelectMode()
   } catch {
     /* cancelled */
   }
@@ -374,35 +367,30 @@ function addRequestToCollection(collectionId: string): void {
 }
 
 /**
- * 导出所有集合到 JSON 文件
- * 使用 Electron API 打开文件保存对话框,用户选择路径后写入数据
- */
-async function exportCollections(): Promise<void> {
-  if (!window.api) return
-  const filePath = await window.api.saveFile('collections.json')
-  if (!filePath) return
-  const data = JSON.stringify(collectionStore.collections, null, 2)
-  const result = await window.api.writeFile(filePath, data)
-  if (result.success) {
-    toast.success(t('toast.exportSuccess'))
-  } else {
-    toast.error(result.error || 'Export failed')
-  }
-}
-
-/**
  * 导出单个集合为 Postman Collection v2.1 JSON
  * @param collectionId 集合 ID (不传则导出所有集合)
  */
 async function exportPostman(collectionId?: string): Promise<void> {
   if (!window.api) return
-  const cols = collectionId
-    ? collectionStore.collections.filter((c) => c.id === collectionId)
-    : collectionStore.collections
-  if (cols.length === 0) return
-  const postmanData = cols.length === 1 ? collectionToPostmanV21(cols[0]) : cols.map(collectionToPostmanV21)
-  const defaultName = cols.length === 1 ? `${cols[0].name}.postman_collection.json` : 'collections.postman_collection.json'
-  const filePath = await window.api.saveFile(defaultName)
+
+  let collection = collectionStore.collections.length === 1
+    ? collectionStore.collections[0]
+    : null
+
+  if (collectionId) {
+    collection = null
+    for (const existingCollection of collectionStore.collections) {
+      if (existingCollection.id === collectionId) {
+        collection = existingCollection
+        break
+      }
+    }
+  }
+
+  if (!collection) return
+
+  const postmanData = collectionToPostmanV21(collection)
+  const filePath = await window.api.saveFile(`${collection.name}.postman_collection.json`)
   if (!filePath) return
   const data = JSON.stringify(postmanData, null, 2)
   const result = await window.api.writeFile(filePath, data)
@@ -421,7 +409,6 @@ async function exportHtmlDoc(collectionId: string): Promise<void> {
   if (!window.api) return
   const col = collectionStore.collections.find((c) => c.id === collectionId)
   if (!col) return
-  // 获取当前语言设置
   const currentLocale = localStorage.getItem('requestor-language') || 'zh-CN'
   const html = collectionToHtmlDoc(col, currentLocale as 'zh-CN' | 'en-US')
   const filePath = await window.api.saveFile(`${col.name}.html`)
@@ -435,11 +422,9 @@ async function exportHtmlDoc(collectionId: string): Promise<void> {
 }
 
 /**
- * 从 JSON 文件导入集合
- * 使用 Electron API 打开文件选择对话框,解析 JSON 并恢复集合数据
- * 支持批量导入多个集合,导入后自动展开
+ * 从 Postman Collection JSON 文件导入集合
  */
-async function importCollections(): Promise<void> {
+async function importPostmanCollections(): Promise<void> {
   if (!window.api) return
   const filePath = await window.api.openJsonFile()
   if (!filePath) return
@@ -448,21 +433,24 @@ async function importCollections(): Promise<void> {
     toast.error(result.error || 'Import failed')
     return
   }
+
   try {
     const parsed = JSON.parse(result.content ?? '')
-    if (!Array.isArray(parsed)) {
-      toast.error(t('toast.importError'))
+    const collections = parsePostmanCollections(parsed)
+
+    if (!collections) {
+      toast.error(t('toast.postmanImportError'))
       return
     }
-    for (const col of parsed) {
-      if (col.id && col.name && Array.isArray(col.items)) {
-        collectionStore.restore(col, { trustScripts: false }) // 恢复集合(如果已存在则跳过)
-        expandedIds.value.add(col.id) // 自动展开导入的集合
-      }
+
+    for (const collection of collections) {
+      collectionStore.restore(collection, { trustScripts: false })
+      expandedIds.value.add(collection.id)
     }
-    toast.success(t('toast.importSuccess', { count: parsed.length }))
+
+    toast.success(t('toast.postmanImportSuccess', { count: collections.length }))
   } catch {
-    toast.error(t('toast.importError'))
+    toast.error(t('toast.postmanImportError'))
   }
 }
 
@@ -532,41 +520,21 @@ function startItemRename(collectionId: string, itemId: string): void {
           <el-icon :size="14"><Select /></el-icon>
           {{ t('history.selectMode') }}
         </el-button>
-        <el-button
-          size="small"
-          text
-          :title="t('common.export')"
-          @click="exportCollections"
-        >
-          <el-icon :size="14">
-            <Download />
-          </el-icon>
-        </el-button>
-        <el-dropdown v-if="collectionStore.collections.length > 0" trigger="click">
-          <el-button size="small" text :title="t('collection.exportPostman')">
+        <el-dropdown trigger="click">
+          <el-button size="small" text :title="t('collection.postmanMenu')">
             <el-icon :size="14"><Tickets /></el-icon>
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="exportPostman()">
-                {{ t('collection.exportPostman') }}
+              <el-dropdown-item @click="importPostmanCollections()">
+                {{ t('collection.importPostman') }}
               </el-dropdown-item>
-              <el-dropdown-item v-if="collectionStore.collections.length === 1" @click="exportHtmlDoc(collectionStore.collections[0].id)">
-                {{ t('collection.exportHtmlDoc') }}
+              <el-dropdown-item :disabled="collectionStore.collections.length !== 1" @click="exportPostman()">
+                {{ t('collection.exportPostman') }}
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <el-button
-          size="small"
-          text
-          :title="t('common.import')"
-          @click="importCollections"
-        >
-          <el-icon :size="14">
-            <Upload />
-          </el-icon>
-        </el-button>
       </template>
       <template v-else>
         <el-button
@@ -726,7 +694,6 @@ function startItemRename(collectionId: string, itemId: string): void {
       </div>
     </div>
 
-    <!-- Context Menu -->
     <Teleport to="body">
       <div
         v-if="contextMenu.show"
@@ -1038,7 +1005,6 @@ function startItemRename(collectionId: string, itemId: string): void {
   margin: var(--space-xs) 0;
 }
 
-/* Drag and drop styles */
 .ghost-item {
   opacity: 0.5;
   background: var(--color-accent);
