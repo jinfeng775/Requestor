@@ -18,8 +18,8 @@ const METHOD_COLORS: Record<string, string> = {
 }
 
 /** 转义 HTML 特殊字符 */
-function escapeHtml(str: string): string {
-  return str
+function escapeHtml(value: string | null | undefined): string {
+  return (value ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
