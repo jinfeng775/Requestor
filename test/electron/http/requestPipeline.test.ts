@@ -14,14 +14,87 @@ const okResponse: HttpResponseData = {
   headerSize: 35,
   totalTime: 12,
   contentType: 'application/json',
-  cookies: []
+  cookies: [],
+  networkDetails: {
+    overview: {
+      method: 'GET',
+      finalUrl: 'https://api.example.com',
+      status: 200,
+      statusText: 'OK',
+      totalTime: 12,
+      requestBodySize: 0,
+      responseBodySize: 15,
+      transferredSize: 50,
+      protocol: 'HTTP/1.1'
+    },
+    request: {
+      method: 'GET',
+      originalUrl: 'https://api.example.com',
+      finalUrl: 'https://api.example.com',
+      queryString: [],
+      headers: [],
+      headerSize: 0,
+      bodyPreview: '',
+      bodySize: 0,
+      bodyType: 'none',
+      contentType: ''
+    },
+    response: {
+      url: 'https://api.example.com',
+      status: 200,
+      statusText: 'OK',
+      headers: [{ name: 'content-type', value: 'application/json' }],
+      rawHeaders: { 'content-type': 'application/json' },
+      headerSize: 35,
+      bodySize: 15,
+      contentType: 'application/json',
+      cookies: [],
+      protocol: 'HTTP/1.1'
+    },
+    timing: {
+      totalMs: 12,
+      waitingTtfbMs: 7,
+      downloadMs: 5,
+      accuracy: 'measured',
+      unsupportedPhases: ['dns', 'connect', 'ssl']
+    },
+    redirects: []
+  }
 }
+
 
 async function trustAllScripts(): Promise<boolean> {
   return true
 }
 
 describe('executeRequestWithScripts', () => {
+  it('preserves the network details contract alongside legacy response fields', async () => {
+    const result = await executeRequestWithScripts(
+      {
+        ...DEFAULT_REQUEST,
+        url: 'https://api.example.com',
+        scripts: {
+          preRequest: '',
+          postRequest: '',
+          trusted: false
+        }
+      },
+      {},
+      {
+        executeHttpRequest: async () => okResponse
+      }
+    )
+
+    assert.equal(result.success, true)
+    assert.equal(result.data?.status, 200)
+    assert.equal(result.data?.headers['content-type'], 'application/json')
+    assert.equal(result.data?.networkDetails?.overview.finalUrl, 'https://api.example.com')
+    assert.equal(result.data?.networkDetails?.request.method, 'GET')
+    assert.equal(result.data?.networkDetails?.response.protocol, 'HTTP/1.1')
+    assert.equal(result.data?.networkDetails?.timing.totalMs, 12)
+    assert.deepEqual(result.data?.networkDetails?.redirects, [])
+  })
+
   it('runs pre-request script before HTTP execution and post-request script after response', async () => {
     const calls: string[] = []
     const runner: ScriptRunner = async (context) => {

@@ -37,8 +37,10 @@ export const useHistoryStore = defineStore('history', () => {
         : null,
       responseBody: response?.body,
       responseHeaders: response?.headers,
+      responseHeaderSize: response?.headerSize,
       responseCookies: response?.cookies,
       responseContentType: response?.contentType,
+      responseNetworkDetails: response?.networkDetails,
       error,
       timestamp: Date.now()
     }

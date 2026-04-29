@@ -7,8 +7,16 @@ import type {
   HttpRequestConfig,
   HttpResponseData,
   KeyValue,
-  FormDataEntry
+  FormDataEntry,
+  NetworkCookie,
+  NetworkDetails,
+  NetworkHeaderEntry,
+  NetworkQueryParam,
+  NetworkTimingBreakdown
 } from '../../src/renderer/src/types/request'
+
+const MAX_BODY_PREVIEW_LENGTH = 16 * 1024
+const TIMING_UNSUPPORTED_PHASES: NetworkTimingBreakdown['unsupportedPhases'] = ['dns', 'connect', 'ssl']
 
 function interpolate(str: string, vars: Record<string, string>, warnings: VariableWarning[]): string {
   const result = resolveVariables(str, { variables: vars })
@@ -26,6 +34,59 @@ function interpolateKv(
     key: interpolate(item.key, vars, warnings),
     value: interpolate(item.value, vars, warnings)
   }))
+}
+
+function toNetworkHeaderEntries(headers: Record<string, string>): NetworkHeaderEntry[] {
+  return Object.entries(headers).map(([name, value]) => ({ name, value }))
+}
+
+function toNetworkQueryParams(params: KeyValue[]): NetworkQueryParam[] {
+  return params
+    .filter((param) => param.enabled && param.key)
+    .map((param) => ({
+      key: param.key,
+      value: param.value,
+      enabled: param.enabled
+    }))
+}
+
+function computeHeaderSize(headers: Record<string, string>): number {
+  return Object.entries(headers).reduce((total, [key, value]) => total + key.length + value.length + 4, 0)
+}
+
+function createBodyPreview(body: string | Buffer | null): string {
+  if (body === null) return ''
+  if (Buffer.isBuffer(body)) {
+    return `[binary body omitted, ${body.length} bytes]`
+  }
+  if (body.length <= MAX_BODY_PREVIEW_LENGTH) {
+    return body
+  }
+  return `${body.slice(0, MAX_BODY_PREVIEW_LENGTH)}\n… truncated (${body.length - MAX_BODY_PREVIEW_LENGTH} more chars)`
+}
+
+function computeBodySize(body: string | Buffer | null): number {
+  if (body === null) return 0
+  return Buffer.isBuffer(body) ? body.length : Buffer.byteLength(body)
+}
+
+function getResponseHttpVersion(response: unknown): string | undefined {
+  const candidate = response as { httpVersion?: string }
+  if (!candidate.httpVersion) return undefined
+  return `HTTP/${candidate.httpVersion}`
+}
+
+function getResponseRemoteAddress(response: unknown): { remoteAddress?: string; remotePort?: number } {
+  const candidate = response as {
+    socket?: {
+      remoteAddress?: string
+      remotePort?: number
+    }
+  }
+  return {
+    remoteAddress: candidate.socket?.remoteAddress,
+    remotePort: candidate.socket?.remotePort
+  }
 }
 
 /**
@@ -62,18 +123,15 @@ function buildHeaders(
     headers[h.key] = h.value
   }
 
-  // Bearer Token 认证
   if (config.authType === 'bearer' && config.auth) {
     const auth = config.auth as { token: string }
     headers['Authorization'] = `Bearer ${interpolate(auth.token, envVars, warnings)}`
   } else if (config.authType === 'basic' && config.auth) {
-    // Basic Auth 认证(Base64 编码用户名:密码)
     const auth = config.auth as { username: string; password: string }
     const u = interpolate(auth.username, envVars, warnings)
     const p = interpolate(auth.password, envVars, warnings)
     headers['Authorization'] = `Basic ${Buffer.from(`${u}:${p}`).toString('base64')}`
   } else if (config.authType === 'apikey' && config.auth) {
-    // API Key 认证(可添加到 header 或 query)
     const auth = config.auth as { key: string; value: string; addTo: 'header' | 'query' }
     if (auth.addTo === 'header') {
       headers[interpolate(auth.key, envVars, warnings)] = interpolate(
@@ -104,7 +162,6 @@ function buildMultipartFormData(
   envVars: Record<string, string>,
   warnings: VariableWarning[]
 ): MultipartResult {
-  // 生成唯一的 boundary 字符串
   const boundary = `----FormBoundary${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`
   const parts: Buffer[] = []
 
@@ -114,7 +171,6 @@ function buildMultipartFormData(
     let part = `--${boundary}\r\n`
 
     if (entry.type === 'file' && entry.filePath) {
-      // 文件上传:读取文件内容并设置 Content-Disposition
       try {
         const fileData = readFileSync(entry.filePath)
         const fileName = basename(entry.filePath)
@@ -124,12 +180,10 @@ function buildMultipartFormData(
         parts.push(fileData)
         parts.push(Buffer.from('\r\n'))
       } catch {
-        // 文件读取失败,跳过该字段
         part += `Content-Disposition: form-data; name="${key}"\r\n\r\n\r\n`
         parts.push(Buffer.from(part))
       }
     } else {
-      // 文本字段
       const value = interpolate(entry.value, envVars, warnings)
       part += `Content-Disposition: form-data; name="${key}"\r\n\r\n`
       part += `${value}\r\n`
@@ -137,9 +191,8 @@ function buildMultipartFormData(
     }
   }
 
-  // 添加结束 boundary
   parts.push(Buffer.from(`--${boundary}--\r\n`))
-  const body = Buffer.concat(parts) // 拼接所有部分
+  const body = Buffer.concat(parts)
 
   return {
     body,
@@ -196,12 +249,10 @@ function buildBody(
 ): { body: string | Buffer | null; contentType: string | null } {
   if (config.bodyType === 'none') return { body: null, contentType: null }
 
-  // 原始请求体(JSON/XML/HTML/Text)
   if (config.bodyType === 'raw') {
     return { body: interpolate(config.rawBody, envVars, warnings), contentType: getContentType(config) }
   }
 
-  // x-www-form-urlencoded 表单数据
   if (config.bodyType === 'x-www-form-urlencoded') {
     const data = interpolateKv(config.urlEncodedData, envVars, warnings).filter(
       (d) => d.enabled && d.key
@@ -212,13 +263,11 @@ function buildBody(
     return { body: params, contentType: 'application/x-www-form-urlencoded' }
   }
 
-  // multipart/form-data(支持文件上传)
   if (config.bodyType === 'form-data') {
     const result = buildMultipartFormData(config.formData, envVars, warnings)
     return { body: result.body, contentType: result.contentType }
   }
 
-  // 二进制文件
   if (config.bodyType === 'binary' && config.binaryFilePath) {
     const result = buildBinaryBody(config.binaryFilePath)
     if (result) return { body: result.body, contentType: result.contentType }
@@ -227,33 +276,33 @@ function buildBody(
   return { body: null, contentType: null }
 }
 
-/**
- * 执行 HTTP 请求的核心函数
- * 完整的请求流程:
- * 1. URL 插值和 QueryString 构建
- * 2. API Key 认证的特殊处理(query/header)
- * 3. URL 验证和协议补全
- * 4. 请求头和请求体构建
- * 5. Electron net.request 的异步处理
- * 6. 响应数据的收集和处理(cookies, headers, body)
- * 7. 性能统计(totalTime, bodySize)
- *
- * @param config HTTP 请求配置
- * @param envVars 环境变量映射
- * @returns Promise<HttpResponseData>
- */
+function buildMergedUrl(
+  rawUrl: string,
+  params: KeyValue[]
+): string {
+  if (!rawUrl || !rawUrl.trim()) return rawUrl
+
+  const normalizedUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : `http://${rawUrl}`
+  const url = new URL(normalizedUrl)
+
+  for (const param of params) {
+    if (!param.enabled || !param.key) continue
+    url.searchParams.append(param.key, param.value)
+  }
+
+  return url.toString()
+}
+
 export async function executeRequest(
   config: HttpRequestConfig,
   envVars: Record<string, string> = {}
 ): Promise<HttpResponseData> {
   const variableWarnings: VariableWarning[] = []
 
-  // 1. URL 插值和 QueryString 构建
   const interpolatedUrl = interpolate(config.url, envVars, variableWarnings).trim()
-  const queryString = buildQueryString(interpolateKv(config.params, envVars, variableWarnings))
-  let fullUrl = interpolatedUrl + queryString
+  const interpolatedParams = interpolateKv(config.params, envVars, variableWarnings)
+  let fullUrl = buildMergedUrl(interpolatedUrl, interpolatedParams)
 
-  // 2. API Key 认证的特殊处理(如果设置为添加到 query)
   if (config.authType === 'apikey' && config.auth) {
     const auth = config.auth as { key: string; value: string; addTo: 'header' | 'query' }
     if (auth.addTo === 'query') {
@@ -262,78 +311,97 @@ export async function executeRequest(
     }
   }
 
-  // 3. URL 验证
   if (!fullUrl || !fullUrl.trim()) {
     throw { message: 'URL is empty', code: 'INVALID_URL' }
   }
 
-  // 自动补全协议
   if (!/^https?:\/\//i.test(fullUrl)) {
     fullUrl = 'http://' + fullUrl
   }
 
-  // 验证 URL 是否可解析
   try {
     new URL(fullUrl)
   } catch {
     throw { message: `Invalid URL: ${fullUrl}`, code: 'INVALID_URL' }
   }
 
-  // 4. 构建请求头和请求体
   const headers = buildHeaders(config, envVars, variableWarnings)
   const { body, contentType } = buildBody(config, envVars, variableWarnings)
 
-  // 自动设置 Content-Type(如果未手动指定)
   if (contentType && !headers['Content-Type']) {
     headers['Content-Type'] = contentType
   }
 
-  // GET 和 HEAD 请求不包含请求体
   const hasBody = !['GET', 'HEAD'].includes(config.method)
+  const requestBodySize = hasBody ? computeBodySize(body) : 0
+  const requestHeaderSize = computeHeaderSize(headers)
+  const requestBodyPreview = hasBody ? createBodyPreview(body) : ''
+  const requestQueryString = toNetworkQueryParams(interpolatedParams)
 
-  // 5-7. 发送请求并处理响应
   return new Promise((resolve, reject) => {
-    const startTime = Date.now() // 记录开始时间用于性能统计
+    const startTime = Date.now()
+    let firstByteAt: number | null = null
+    let responseHeaders: Record<string, string> = {}
+    let statusCode = 0
+    let statusText = ''
+    let protocol: string | undefined
+    let remoteAddress: string | undefined
+    let remotePort: number | undefined
+    const redirects: NetworkDetails['redirects'] = []
 
     const request = net.request({
       method: config.method,
       url: fullUrl,
-      redirect: 'follow' // 自动跟随重定向
+      redirect: 'follow'
     })
 
-    // 设置请求头
     for (const [key, value] of Object.entries(headers)) {
       request.setHeader(key, value)
     }
 
-    let responseHeaders: Record<string, string> = {}
-    let statusCode = 0
-    let statusText = ''
+    ;(request as unknown as {
+      on(event: 'redirect', listener: (statusCode: number, method: string, redirectUrl: string, responseHeaders: Record<string, string | string[]>) => void): void
+    }).on?.('redirect', (redirectStatusCode, redirectMethod, redirectUrl, redirectHeaders) => {
+      redirects.push({
+        status: redirectStatusCode,
+        statusText: '',
+        method: (redirectMethod.toUpperCase() || config.method) as HttpRequestConfig['method'],
+        url: redirectUrl,
+        location: Array.isArray(redirectHeaders.location)
+          ? redirectHeaders.location[0]
+          : redirectHeaders.location
+      })
+    })
 
-    // 监听响应
     request.on('response', (response) => {
       statusCode = response.statusCode
       statusText = response.statusMessage || ''
+      protocol = getResponseHttpVersion(response)
+      const remote = getResponseRemoteAddress(response)
+      remoteAddress = remote.remoteAddress
+      remotePort = remote.remotePort
 
-      // 收集响应头
       for (const [key, value] of Object.entries(response.headers)) {
         responseHeaders[key] = Array.isArray(value) ? value.join(', ') : String(value)
       }
 
-      // 收集响应体数据
       const chunks: Buffer[] = []
       response.on('data', (chunk: Buffer) => {
+        if (firstByteAt === null) {
+          firstByteAt = Date.now()
+        }
         chunks.push(chunk)
       })
 
-      // 响应结束
       response.on('end', () => {
-        const totalTime = Date.now() - startTime // 计算总耗时
+        const endedAt = Date.now()
+        const totalTime = endedAt - startTime
         const bodyBuffer = Buffer.concat(chunks)
         const bodyStr = bodyBuffer.toString('utf-8')
+        const responseHeaderSize = computeHeaderSize(responseHeaders)
+        const responseContentType = responseHeaders['content-type'] || ''
 
-        // 解析 Cookies
-        const cookies: Array<{ name: string; value: string; domain: string; path: string }> = []
+        const cookies: NetworkCookie[] = []
         const setCookie = response.headers['set-cookie']
         if (setCookie) {
           const cookieList = Array.isArray(setCookie) ? setCookie : [setCookie]
@@ -351,17 +419,68 @@ export async function executeRequest(
           }
         }
 
-        // 返回响应数据
+        const waitingTtfbMs = firstByteAt === null ? totalTime : firstByteAt - startTime
+        const downloadMs = firstByteAt === null ? 0 : endedAt - firstByteAt
+
+        const networkDetails: NetworkDetails = {
+          overview: {
+            method: config.method,
+            finalUrl: fullUrl,
+            status: statusCode,
+            statusText,
+            totalTime,
+            requestBodySize,
+            responseBodySize: bodyBuffer.length,
+            transferredSize: responseHeaderSize + bodyBuffer.length,
+            protocol
+          },
+          request: {
+            method: config.method,
+            originalUrl: config.url,
+            finalUrl: fullUrl,
+            queryString: requestQueryString,
+            headers: toNetworkHeaderEntries(headers),
+            headerSize: requestHeaderSize,
+            bodyPreview: requestBodyPreview,
+            bodySize: requestBodySize,
+            bodyType: config.bodyType,
+            contentType: headers['Content-Type'] || ''
+          },
+          response: {
+            url: fullUrl,
+            status: statusCode,
+            statusText,
+            headers: toNetworkHeaderEntries(responseHeaders),
+            rawHeaders: responseHeaders,
+            headerSize: responseHeaderSize,
+            bodySize: bodyBuffer.length,
+            contentType: responseContentType,
+            cookies,
+            remoteAddress,
+            remotePort,
+            protocol
+          },
+          timing: {
+            totalMs: totalTime,
+            waitingTtfbMs,
+            downloadMs,
+            accuracy: 'measured',
+            unsupportedPhases: TIMING_UNSUPPORTED_PHASES
+          },
+          redirects
+        }
+
         resolve({
           status: statusCode,
           statusText,
           headers: responseHeaders,
           body: bodyStr,
           bodySize: bodyBuffer.length,
-          headerSize: JSON.stringify(responseHeaders).length,
+          headerSize: responseHeaderSize,
           totalTime,
-          contentType: responseHeaders['content-type'] || '',
+          contentType: responseContentType,
           cookies,
+          networkDetails,
           variableWarnings
         })
       })
@@ -375,13 +494,8 @@ export async function executeRequest(
       reject({ message: err.message, code: 'REQUEST_ERROR' })
     })
 
-    // 发送请求体
     if (hasBody && body) {
-      if (Buffer.isBuffer(body)) {
-        request.write(body)
-      } else {
-        request.write(body)
-      }
+      request.write(body)
     }
 
     request.end()

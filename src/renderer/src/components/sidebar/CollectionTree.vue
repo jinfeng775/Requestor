@@ -227,10 +227,11 @@ function loadRequest(collectionId: string, itemId: string): void {
       headers: latest.headers,
       body: latest.body,
       bodySize: latest.bodySize,
-      headerSize: 0,
+      headerSize: latest.headerSize ?? latest.networkDetails?.response?.headerSize ?? 0,
       totalTime: latest.totalTime,
       contentType: latest.contentType,
-      cookies: latest.cookies
+      cookies: latest.cookies,
+      networkDetails: latest.networkDetails
     })
   } else {
     response.clear()

@@ -1,4 +1,4 @@
-import type { HttpRequestConfig, HttpResponseData } from './request'
+import type { HttpRequestConfig, HttpResponseData, NetworkDetails } from './request'
 
 /** 响应示例 - 保存的请求/响应对 */
 export interface ResponseExample {
@@ -10,8 +10,10 @@ export interface ResponseExample {
   body: string
   contentType: string
   bodySize: number
+  headerSize?: number
   totalTime: number
   cookies: HttpResponseData['cookies']
+  networkDetails?: NetworkDetails
   createdAt: number
 }
 

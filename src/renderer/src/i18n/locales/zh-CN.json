@@ -288,6 +288,57 @@
     "domain": "域名",
     "path": "路径"
   },
+  "networkDetails": {
+    "title": "网络详情",
+    "shortcut": "Ctrl/Cmd + Shift + I",
+    "hint": "按 {shortcut} 查看网络详情",
+    "unavailable": "当前响应没有可查看的网络详情",
+    "tabs": {
+      "overview": "概览",
+      "headers": "标头",
+      "payload": "载荷",
+      "timing": "时序"
+    },
+    "overview": {
+      "redirects": "{count} 次重定向",
+      "request": "请求",
+      "response": "响应",
+      "connection": "连接",
+      "body": "主体",
+      "headers": "标头",
+      "queryParams": "查询参数",
+      "cookies": "Cookie",
+      "protocol": "协议",
+      "remoteIp": "远程 IP",
+      "remotePort": "远程端口",
+      "unknown": "未知",
+      "unavailable": "不可用"
+    },
+    "headersView": {
+      "general": "常规",
+      "queryString": "查询字符串参数",
+      "requestHeaders": "请求标头",
+      "responseHeaders": "响应标头",
+      "requestUrl": "请求 URL",
+      "requestMethod": "请求方法",
+      "statusCode": "状态码",
+      "remoteAddress": "远程地址",
+      "referrerPolicy": "引用方策略",
+      "emptyQuery": "没有查询字符串参数"
+    },
+    "payloadView": {
+      "noContentType": "无内容类型",
+      "empty": "没有请求载荷"
+    },
+    "timingView": {
+      "total": "总耗时",
+      "accuracy": "精度",
+      "unsupported": "暂不支持",
+      "none": "无",
+      "waiting": "等待 (TTFB)",
+      "download": "内容下载"
+    }
+  },
   "environmentEditor": {
     "keyPlaceholder": "变量名",
     "valuePlaceholder": "值"

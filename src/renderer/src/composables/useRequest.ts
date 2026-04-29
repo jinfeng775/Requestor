@@ -89,8 +89,10 @@ export function useRequest() {
             body: data.body,
             contentType: data.contentType,
             bodySize: data.bodySize,
+            headerSize: data.headerSize,
             totalTime: data.totalTime,
             cookies: data.cookies,
+            networkDetails: data.networkDetails,
             createdAt: Date.now()
           }
           collections.addResponseExample(colId, itmId, example)

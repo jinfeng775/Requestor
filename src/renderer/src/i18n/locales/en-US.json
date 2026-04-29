@@ -288,6 +288,57 @@
     "domain": "Domain",
     "path": "Path"
   },
+  "networkDetails": {
+    "title": "Network Details",
+    "shortcut": "Ctrl/Cmd + Shift + I",
+    "hint": "Press {shortcut} to view network details",
+    "unavailable": "No network details are available for the current response",
+    "tabs": {
+      "overview": "Overview",
+      "headers": "Headers",
+      "payload": "Payload",
+      "timing": "Timing"
+    },
+    "overview": {
+      "redirects": "{count} redirect(s)",
+      "request": "Request",
+      "response": "Response",
+      "connection": "Connection",
+      "body": "Body",
+      "headers": "Headers",
+      "queryParams": "Query Params",
+      "cookies": "Cookies",
+      "protocol": "Protocol",
+      "remoteIp": "Remote IP",
+      "remotePort": "Remote Port",
+      "unknown": "Unknown",
+      "unavailable": "Unavailable"
+    },
+    "headersView": {
+      "general": "General",
+      "queryString": "Query String Parameters",
+      "requestHeaders": "Request Headers",
+      "responseHeaders": "Response Headers",
+      "requestUrl": "Request URL",
+      "requestMethod": "Request Method",
+      "statusCode": "Status Code",
+      "remoteAddress": "Remote Address",
+      "referrerPolicy": "Referrer Policy",
+      "emptyQuery": "No query string parameters"
+    },
+    "payloadView": {
+      "noContentType": "No content type",
+      "empty": "No request payload"
+    },
+    "timingView": {
+      "total": "Total",
+      "accuracy": "Accuracy",
+      "unsupported": "Unsupported",
+      "none": "None",
+      "waiting": "Waiting (TTFB)",
+      "download": "Content Download"
+    }
+  },
   "environmentEditor": {
     "keyPlaceholder": "key",
     "valuePlaceholder": "value"

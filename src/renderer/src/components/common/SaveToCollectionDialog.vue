@@ -17,7 +17,7 @@ import type { ResponseExample } from '@/types/collection'
 export interface SaveItem {
   name: string
   request: HttpRequestConfig
-  response?: Pick<HttpResponseData, 'status' | 'statusText' | 'body' | 'headers' | 'contentType' | 'bodySize' | 'totalTime' | 'cookies'>
+  response?: Pick<HttpResponseData, 'status' | 'statusText' | 'body' | 'headers' | 'contentType' | 'bodySize' | 'headerSize' | 'totalTime' | 'cookies' | 'networkDetails'>
 }
 
 const { t } = useI18n()
@@ -105,9 +105,11 @@ function onSave(): void {
         body: item.response.body,
         contentType: item.response.contentType,
         bodySize: item.response.bodySize,
+        headerSize: item.response.headerSize,
         totalTime: item.response.totalTime,
         cookies: item.response.cookies,
-        createdAt: Date.now()
+        networkDetails: item.response.networkDetails,
+        createdAt: Date.now(),
       }
       collections.addResponseExample(targetId, newItem.id, example)
     }

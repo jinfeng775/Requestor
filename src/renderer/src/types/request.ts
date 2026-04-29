@@ -6,6 +6,97 @@ export interface VariableWarning {
   message: string
 }
 
+export interface NetworkHeaderEntry {
+  name: string
+  value: string
+}
+
+export interface NetworkQueryParam {
+  key: string
+  value: string
+  enabled: boolean
+}
+
+export interface NetworkCookie {
+  name: string
+  value: string
+  domain: string
+  path: string
+  httpOnly?: boolean
+  secure?: boolean
+  sameSite?: string
+  expires?: string
+}
+
+export interface NetworkRedirectEntry {
+  status: number
+  statusText: string
+  method: HttpMethod
+  url: string
+  location?: string
+}
+
+export type NetworkUnsupportedTimingPhase = 'dns' | 'connect' | 'ssl'
+
+export interface NetworkTimingBreakdown {
+  queuedMs?: number
+  requestSentMs?: number
+  waitingTtfbMs?: number
+  downloadMs?: number
+  totalMs: number
+  accuracy: 'measured' | 'estimated' | 'unsupported'
+  unsupportedPhases?: NetworkUnsupportedTimingPhase[]
+}
+
+export interface NetworkRequestSnapshot {
+  method: HttpMethod
+  originalUrl: string
+  finalUrl: string
+  queryString: NetworkQueryParam[]
+  headers: NetworkHeaderEntry[]
+  headerSize: number
+  bodyPreview: string
+  bodySize: number
+  bodyType: BodyType
+  contentType: string
+}
+
+export interface NetworkResponseSnapshot {
+  url: string
+  status: number
+  statusText: string
+  headers: NetworkHeaderEntry[]
+  rawHeaders: Record<string, string>
+  headerSize: number
+  bodySize: number
+  contentType: string
+  cookies: NetworkCookie[]
+  remoteAddress?: string
+  remotePort?: number
+  protocol?: string
+  fromCache?: boolean
+}
+
+export interface NetworkOverview {
+  method: HttpMethod
+  finalUrl: string
+  status: number
+  statusText: string
+  totalTime: number
+  requestBodySize: number
+  responseBodySize: number
+  transferredSize: number
+  protocol?: string
+}
+
+export interface NetworkDetails {
+  overview: NetworkOverview
+  request: NetworkRequestSnapshot
+  response: NetworkResponseSnapshot
+  timing: NetworkTimingBreakdown
+  redirects: NetworkRedirectEntry[]
+}
+
 /** HTTP 请求方法 */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS'
 
@@ -130,7 +221,8 @@ export interface HttpResponseData {
   headerSize: number // 响应头大小(字节)
   totalTime: number // 总耗时(毫秒)
   contentType: string // Content-Type
-  cookies: Array<{ name: string; value: string; domain: string; path: string }> // Cookies
+  cookies: NetworkCookie[] // Cookies
+  networkDetails?: NetworkDetails
   variableWarnings?: VariableWarning[] // 变量解析警告
   scriptReport?: ScriptExecutionReport
 }

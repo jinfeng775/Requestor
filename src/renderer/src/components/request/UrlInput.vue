@@ -122,19 +122,24 @@ function onKeydown(e: KeyboardEvent): void {
 function onSaveToCollection(): void {
   if (!editor.hasUrl) return // 没有 URL 时不允许保存
   const tabName = tabStore.activeTab?.name || 'Untitled'
-  const item: SaveItem = { name: tabName, request: editor.activeRequest }
+  const item: SaveItem = {
+    name: tabName,
+    request: JSON.parse(JSON.stringify(editor.activeRequest))
+  }
   // 如果当前有响应数据,一并携带
   if (response.data) {
-    item.response = {
+    item.response = JSON.parse(JSON.stringify({
       status: response.data.status,
       statusText: response.data.statusText,
       body: response.data.body,
       headers: response.data.headers,
       contentType: response.data.contentType,
       bodySize: response.data.bodySize,
+      headerSize: response.data.headerSize,
       totalTime: response.data.totalTime,
-      cookies: response.data.cookies
-    }
+      cookies: response.data.cookies,
+      networkDetails: response.data.networkDetails
+    }))
   }
   saveItems.value = [item]
   showSaveDialog.value = true

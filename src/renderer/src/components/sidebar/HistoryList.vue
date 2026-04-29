@@ -185,10 +185,11 @@ function loadEntry(entry: HistoryEntry): void {
         headers: entry.responseHeaders || {},
         body: entry.responseBody,
         bodySize: entry.response.bodySize,
-        headerSize: 0,
+        headerSize: entry.responseHeaderSize ?? entry.responseNetworkDetails?.response?.headerSize ?? 0,
         totalTime: entry.response.totalTime,
         contentType: entry.responseContentType || '',
-        cookies: entry.responseCookies || []
+        cookies: entry.responseCookies || [],
+        networkDetails: entry.responseNetworkDetails,
       } as HttpResponseData)
     } else {
       response.clear()
@@ -212,8 +213,10 @@ function entryToSaveItem(entry: HistoryEntry): SaveItem {
       headers: entry.responseHeaders || {},
       contentType: entry.responseContentType || '',
       bodySize: entry.response.bodySize,
+      headerSize: entry.responseHeaderSize ?? entry.responseNetworkDetails?.response.headerSize ?? 0,
       totalTime: entry.response.totalTime,
-      cookies: entry.responseCookies || []
+      cookies: entry.responseCookies || [],
+      networkDetails: entry.responseNetworkDetails,
     }
   }
   return item

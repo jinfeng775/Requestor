@@ -11,22 +11,31 @@ import ResponseScripts from './ResponseScripts.vue'
 
 const { t } = useI18n()
 const response = useResponseStore()
-const activeTab = ref('body') // 当前激活的标签页(body/headers/cookies/scripts)
-const isFullscreen = ref(false) // 是否处于全屏模式
+const activeTab = ref('response')
+const isFullscreen = ref(false)
 
-/** 响应查看器的标签页配置 */
+const hasScriptReport = computed(() => Boolean(response.data?.scriptReport || response.error?.scriptReport))
+const showRequestError = computed(() => Boolean(response.error && !hasScriptReport.value))
+
 const tabs = computed(() => {
-  const scriptTab = { key: 'scripts', labelKey: 'scripts.title' }
+  const items = [] as Array<{ key: string; label: string }>
+
   if (response.data) {
-    return [
-      { key: 'body', labelKey: 'response.body' },
-      { key: 'headers', labelKey: 'response.headers' },
-      { key: 'cookies', labelKey: 'response.cookies' },
-      scriptTab
-    ]
+    items.push({ key: 'response', label: t('response.body') })
+    items.push({ key: 'headers', label: t('response.headers') })
+    items.push({ key: 'cookies', label: t('response.cookies') })
   }
 
-  return [scriptTab]
+  if (hasScriptReport.value) {
+    items.push({ key: 'scripts', label: t('scripts.title') })
+  }
+
+  return items
+})
+
+const networkHint = computed(() => {
+  if (!response.data?.networkDetails) return ''
+  return t('networkDetails.hint', { shortcut: t('networkDetails.shortcut') })
 })
 
 watch(
@@ -36,23 +45,25 @@ watch(
   }
 )
 
-/** 切换全屏模式 */
+watch(
+  () => response.data,
+  (data) => {
+    if (data) {
+      activeTab.value = 'response'
+    }
+  }
+)
+
 function toggleFullscreen(): void {
   isFullscreen.value = !isFullscreen.value
 }
 
-/**
- * 全局键盘事件监听器
- * 在全屏模式下按 Escape 键退出全屏
- * @param e 键盘事件对象
- */
 function onGlobalKeydown(e: KeyboardEvent): void {
   if (e.key === 'Escape' && isFullscreen.value) {
     isFullscreen.value = false
   }
 }
 
-// 组件挂载时添加全局键盘监听,卸载时移除(防止内存泄漏)
 onMounted(() => document.addEventListener('keydown', onGlobalKeydown))
 onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
 </script>
@@ -62,7 +73,11 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
     <ResponseMeta />
 
     <template v-if="response.hasResponse">
-      <div class="response-viewer__tabs">
+      <div v-if="networkHint" class="response-viewer__hint">
+        {{ networkHint }}
+      </div>
+
+      <div v-if="tabs.length > 0" class="response-viewer__tabs">
         <div class="response-viewer__tabs-left">
           <button
             v-for="tab in tabs"
@@ -70,10 +85,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             :class="['response-viewer__tab', { 'response-viewer__tab--active': activeTab === tab.key }]"
             @click="activeTab = tab.key"
           >
-            {{ t(tab.labelKey) }}
-            <span v-if="tab.key === 'headers' && response.data" class="response-viewer__tab-count">
-              ({{ Object.keys(response.data.headers).length }})
-            </span>
+            {{ tab.label }}
           </button>
         </div>
         <button class="response-viewer__fullscreen-btn" :title="t('response.fullscreen')" @click="toggleFullscreen">
@@ -82,14 +94,18 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
       </div>
 
       <div class="response-viewer__panel">
-        <ResponseBody v-if="activeTab === 'body'" />
+        <div v-if="showRequestError" class="response-viewer__error-panel">
+          <p class="response-viewer__error-title">{{ t('response.error') }}</p>
+          <p class="response-viewer__error-message">{{ response.error?.message }}</p>
+        </div>
+        <ResponseBody v-else-if="activeTab === 'response'" />
         <ResponseHeaders v-else-if="activeTab === 'headers'" />
         <ResponseCookies v-else-if="activeTab === 'cookies'" />
         <ResponseScripts v-else-if="activeTab === 'scripts'" />
       </div>
     </template>
 
-    <div v-else-if="!response.hasResponse" class="response-viewer__empty">
+    <div v-else class="response-viewer__empty">
       <p>{{ t('response.noResponse') }}</p>
     </div>
   </div>
@@ -112,6 +128,14 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   padding: var(--space-md);
 }
 
+.response-viewer__hint {
+  padding: var(--space-xs) var(--space-lg);
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  background: var(--color-bg-secondary);
+}
+
 .response-viewer__tabs {
   display: flex;
   align-items: center;
@@ -119,10 +143,12 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   border-bottom: 1px solid var(--color-border-light);
   padding: 0 var(--space-lg);
   flex-shrink: 0;
+  background: var(--color-bg-primary);
 }
 
 .response-viewer__tabs-left {
   display: flex;
+  overflow-x: auto;
 }
 
 .response-viewer__tab {
@@ -135,6 +161,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   cursor: pointer;
   position: relative;
   transition: color var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
 }
 
 .response-viewer__tab:hover {
@@ -160,12 +187,6 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
 @keyframes tab-indicator {
   from { transform: scaleX(0); opacity: 0; }
   to { transform: scaleX(1); opacity: 1; }
-}
-
-.response-viewer__tab-count {
-  font-size: var(--text-xs);
-  color: var(--color-text-tertiary);
-  margin-left: 2px;
 }
 
 .response-viewer__fullscreen-btn {
@@ -198,6 +219,27 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   padding: var(--space-sm) var(--space-lg);
 }
 
+.response-viewer__error-panel {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+}
+
+.response-viewer__error-title {
+  margin: 0;
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+}
+
+.response-viewer__error-message {
+  margin: 0;
+  color: var(--color-text-secondary);
+  word-break: break-word;
+}
+
 .response-viewer__empty {
   flex: 1;
   display: flex;
@@ -207,3 +249,4 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   font-size: var(--text-md);
 }
 </style>
+

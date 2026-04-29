@@ -16,6 +16,7 @@ import HorizontalResizeHandle from '../common/HorizontalResizeHandle.vue'
 import UrlInput from '../request/UrlInput.vue'
 import RequestBuilder from '../request/RequestBuilder.vue'
 import ResponseViewer from '../response/ResponseViewer.vue'
+import NetworkDetailsDialog from '../response/NetworkDetailsDialog.vue'
 import RealtimeWorkspace from '../realtime/RealtimeWorkspace.vue'
 
 const { t } = useI18n()
@@ -126,6 +127,7 @@ const responseStyle = computed(() => {
       </div>
     </div>
     <StatusBar />
+    <NetworkDetailsDialog />
   </div>
 </template>
 

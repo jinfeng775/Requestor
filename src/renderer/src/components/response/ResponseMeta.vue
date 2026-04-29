@@ -1,15 +1,11 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useResponseStore } from '@/stores/response'
-import { computed } from 'vue'
 
 const { t } = useI18n()
 const response = useResponseStore()
 
-/**
- * 根据 HTTP 状态码返回对应的 CSS 类名(用于颜色区分)
- * @returns CSS 类名(如 "status--2xx", "status--4xx")
- */
 const statusClass = computed(() => {
   if (!response.data) return ''
   const s = response.data.status
@@ -19,22 +15,12 @@ const statusClass = computed(() => {
   return 'status--5xx'
 })
 
-/**
- * 格式化字节数为人类可读格式(B/KB/MB)
- * @param bytes 字节数
- * @returns 格式化后的字符串(如 "1.5 KB")
- */
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-/**
- * 格式化毫秒数为人类可读格式(ms/s)
- * @param ms 毫秒数
- * @returns 格式化后的字符串(如 "1.25 s")
- */
 function formatTime(ms: number): string {
   if (ms < 1000) return `${ms} ms`
   return `${(ms / 1000).toFixed(2)} s`
@@ -65,13 +51,13 @@ function formatTime(ms: number): string {
 .response-meta {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
   border-bottom: 1px solid var(--color-border-light);
   font-size: var(--text-sm);
   flex-shrink: 0;
   flex-wrap: wrap;
-  position: relative;
+  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
 }
 
 .response-meta--error {
@@ -112,3 +98,4 @@ function formatTime(ms: number): string {
   color: var(--color-text-secondary);
 }
 </style>
+
