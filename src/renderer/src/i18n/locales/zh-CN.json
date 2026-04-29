@@ -44,6 +44,26 @@
     "trash": "垃圾箱",
     "emptyTrash": "垃圾箱为空"
   },
+  "workspace": {
+    "http": "HTTP",
+    "realtime": "实时"
+  },
+  "realtime": {
+    "endpoint": "连接地址",
+    "namespace": "命名空间",
+    "eventName": "事件名",
+    "clientId": "客户端 ID",
+    "publishTopic": "发布主题",
+    "connect": "连接",
+    "disconnect": "断开",
+    "sendMessage": "发送",
+    "subscribe": "订阅",
+    "clearLog": "清空日志",
+    "emptyLog": "连接后可在此查看实时事件",
+    "sessionStatus": "会话状态",
+    "messagePlaceholder": "输入消息内容",
+    "subscriptionPlaceholder": "输入主题或事件"
+  },
   "request": {
     "method": "方法",
     "url": "输入请求 URL",

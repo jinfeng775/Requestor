@@ -2,6 +2,12 @@
 export const IPC_CHANNELS = {
   REQUEST_SEND: 'request:send', // 发送 HTTP 请求
   REQUEST_CANCEL: 'request:cancel', // 取消请求
+  REALTIME_CONNECT: 'realtime:connect',
+  REALTIME_DISCONNECT: 'realtime:disconnect',
+  REALTIME_SEND: 'realtime:send',
+  REALTIME_SUBSCRIBE: 'realtime:subscribe',
+  REALTIME_UNSUBSCRIBE: 'realtime:unsubscribe',
+  REALTIME_EVENT: 'realtime:event',
   COLLECTION_GET_ALL: 'collection:getAll', // 获取所有集合
   COLLECTION_CREATE: 'collection:create', // 创建集合
   COLLECTION_UPDATE: 'collection:update', // 更新集合

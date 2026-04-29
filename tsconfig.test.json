@@ -17,6 +17,7 @@
     "electron/http/variables/**/*.ts",
     "src/renderer/src/types/**/*.ts",
     "src/renderer/src/utils/postman-*.ts",
+    "electron/realtime/**/*.ts",
     "test/**/*.ts"
   ]
 }

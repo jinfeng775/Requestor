@@ -2,7 +2,25 @@
   "permissions": {
     "allow": [
       "Bash(npm test *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "WebFetch(domain:github.com)",
+      "Bash(git checkout *)",
+      "Bash(git -C \"D:/CODE/Requestor/.claude/worktrees/agent-a1a5d020338f289bd\" diff --staged)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" log --oneline --decorate -n 20 -- \"electron\" \"src/renderer/src\")",
+      "Bash(git -C \"D:/CODE/Requestor/.claude/worktrees/agent-a1a5d020338f289bd\" diff)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" diff --name-only HEAD~5..HEAD)",
+      "Bash(git -C \"D:/CODE/Requestor/.claude/worktrees/agent-a1a5d020338f289bd\" log --oneline -5)",
+      "Bash(git -C \"D:/CODE/Requestor/.claude/worktrees/agent-a1a5d020338f289bd\" log --oneline --decorate -10 -- \"tsconfig.node.json\" \"src/renderer/src/env.d.ts\" \"src/renderer/src/components/realtime/RealtimeConnectionForm.vue\" \"electron/preload.ts\" \"electron/ipc/realtime.ts\" \"electron/realtime/sessionManager.ts\" \"src/renderer/src/types/realtime.ts\")",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" ls-tree -r --name-only origin/feat/realtime-protocols -- \"electron/ipc/realtime.ts\" \"electron/realtime/sessionManager.ts\" \"src/renderer/src/components/realtime/RealtimeConnectionForm.vue\" \"src/renderer/src/env.d.ts\" \"electron/preload.ts\")",
+      "Bash(git -C \"D:/CODE/Requestor/.claude/worktrees/agent-a1a5d020338f289bd\" diff HEAD~5..HEAD -- \"tsconfig.node.json\" \"src/renderer/src/env.d.ts\" \"src/renderer/src/components/realtime/RealtimeConnectionForm.vue\" \"electron/preload.ts\" \"electron/ipc/realtime.ts\" \"electron/realtime/sessionManager.ts\" \"src/renderer/src/types/realtime.ts\")",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" show origin/feat/realtime-protocols:electron/preload.ts)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" show origin/feat/realtime-protocols:src/renderer/src/env.d.ts)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" branch -a --list)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" diff --name-only main..feat/realtime-protocols -- \"electron\" \"src/renderer/src\")",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" show feat/realtime-protocols:electron/preload.ts)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" show feat/realtime-protocols:src/renderer/src/env.d.ts)",
+      "Bash(git -C \"/d/CODE/Requestor/.claude/worktrees/agent-a20200c26bcbc64fd\" log --oneline --decorate --stat feat/realtime-protocols -- \"electron/preload.ts\" \"src/renderer/src/env.d.ts\" \"electron/ipc/realtime.ts\" \"electron/realtime/sessionManager.ts\" \"src/renderer/src/components/realtime/RealtimeConnectionForm.vue\")",
+      "Bash(git -C \"D:/CODE/Requestor/.claude/worktrees/agent-a1a5d020338f289bd\" log --all --oneline --decorate --grep=\"realtime\" -i -20)"
     ],
     "defaultMode": "bypassPermissions"
   }
